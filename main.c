@@ -79,7 +79,6 @@ int main(int argc, char** argv) {
 	AVStream* stream=NULL;
 	int cnt = 0;
 
-	//av_read_play(context);//play RTSP
     while(av_read_frame(context, &packet)>=0 && cnt <100){//read 100 frames
         if(packet.stream_index == video_stream_index){//packet is video               
 printf("PACKET %d (pts, dts, size): %d %d %d\n", cnt, packet.pts, packet.dts, packet.size);
@@ -130,7 +129,6 @@ NULL, NULL);
         av_free_packet(&packet);
         av_init_packet(&packet);
     }
-    //av_read_pause(context);
     av_write_trailer(oc);
     avio_close(oc->pb);
     avformat_free_context(oc);
