@@ -41,6 +41,76 @@ void SaveFrame(AVFrame *pFrame, int width, int height, int iFrame) {
 	fclose(pFile);
 }
 
+static int64_t my_guess_correct_pts(AVCodecContext *ctx,
+                                 int64_t reordered_pts, int64_t dts)
+{
+    int64_t pts = AV_NOPTS_VALUE;
+
+    if (dts != AV_NOPTS_VALUE) {
+        ctx->pts_correction_num_faulty_dts += dts <= ctx->pts_correction_last_dts;
+        ctx->pts_correction_last_dts = dts;
+    }
+    if (reordered_pts != AV_NOPTS_VALUE) {
+        ctx->pts_correction_num_faulty_pts += reordered_pts <= ctx->pts_correction_last_pts;
+        ctx->pts_correction_last_pts = reordered_pts;
+    }
+    if ((ctx->pts_correction_num_faulty_pts<=ctx->pts_correction_num_faulty_dts || dts == AV_NOPTS_VALUE)
+       && reordered_pts != AV_NOPTS_VALUE)
+        pts = reordered_pts;
+    else
+        pts = dts;
+
+    return pts;
+}
+
+int my_avcodec_decode_video2(
+	AVCodecContext *avctx, 
+	AVFrame *picture,
+	int *got_picture_ptr,
+	AVPacket *avpkt
+) {
+	int ret;
+	*got_picture_ptr= 0;
+	if((avctx->coded_width||avctx->coded_height) && av_image_check_size(avctx->coded_width, avctx->coded_height, 0, avctx))
+		return -1;
+	avctx->pkt = avpkt;
+	int cond1 = (avctx->codec->capabilities & CODEC_CAP_DELAY);
+	int cond2 = avpkt->size;
+	int cond3 = (avctx->active_thread_type&FF_THREAD_FRAME);
+	int condition = cond1 || cond2 || cond3;
+	if(condition){
+		ret = avctx->codec->decode(avctx, picture, got_picture_ptr, avpkt);
+		picture->pkt_dts= avpkt->dts;
+		if (*got_picture_ptr){
+			avctx->frame_number++;
+			picture->best_effort_timestamp = my_guess_correct_pts(avctx,
+				picture->pkt_pts,
+				picture->pkt_dts);
+		}
+	}else
+		ret= 0;
+	return ret;
+}
+
+static AVFrame *alloc_picture(enum PixelFormat pix_fmt, int width, int height) {
+	AVFrame *picture;
+	uint8_t *picture_buf;
+	int size;
+
+	picture = avcodec_alloc_frame();
+	if (!picture)
+		return NULL;
+	size = avpicture_get_size(pix_fmt, width, height);
+	picture_buf = av_malloc(size);
+	if (!picture_buf) {
+		av_free(picture);
+		return NULL;
+	}
+	avpicture_fill((AVPicture *) picture, picture_buf, pix_fmt, width, height);
+	return picture;
+}
+
+
 int main(int argc, char** argv) {
 	AVFormatContext* context = initialize_av();
 
@@ -56,6 +126,18 @@ int main(int argc, char** argv) {
 			video_stream_index = i;
 	}
 	pCodecCtx = context->streams[video_stream_index]->codec;
+
+AVCodec *pCodec;
+
+// Find the decoder for the video stream
+pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
+if(pCodec==NULL) {
+  fprintf(stderr, "Unsupported codec!\n");
+  return -1; // Codec not found
+}
+// Open codec
+if(avcodec_open(pCodecCtx, pCodec)<0)
+  return -1; // Could not open codec
 
 	int frameFinished;
 
@@ -91,14 +173,42 @@ int main(int argc, char** argv) {
 			packet.stream_index = stream->id;
 			av_write_frame(oc, &packet);
 			cnt++;
-			//avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+
+			AVFrame *pF;
+			pF = avcodec_alloc_frame();
+			AVFrame *pFRGB;
+			pFRGB=avcodec_alloc_frame();
+/*
+			if (pFRGB==NULL)
+				return -1;
+			avpicture_fill((AVPicture *)pFRGB, buf, PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+				SaveFrame(
+					picture, 
+					pCodecCtx->width, 
+					pCodecCtx->height, 
+					cnt
+				);
+*/
+
+				uint8_t *buf;
+				int nB;
+				nB=avpicture_get_size(PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+				buf=(uint8_t *)av_malloc(nB*sizeof(uint8_t));
+				AVPacket avpkt;
+				av_init_packet(&avpkt);
+				avpkt.data = buf;
+				avpkt.size = nB;
+				avpkt.flags = AV_PKT_FLAG_KEY;
+				my_avcodec_decode_video2(pCodecCtx, pF, &frameFinished, &avpkt);
+
 			if (frameFinished) {
 /*
 				img_convert((AVPicture *)pFrameRGB, PIX_FMT_RGB24, 
 					(AVPicture*)pFrame, pCodecCtx->pix_fmt, 
 					pCodecCtx->width, pCodecCtx->height);
 
-				SwsContext* convert_ctx; 
+*/
+				static struct SwsContext *convert_ctx;
 				convert_ctx = sws_getContext(
 					pCodecCtx->width, 
 					pCodecCtx->height, 
@@ -113,20 +223,19 @@ int main(int argc, char** argv) {
 				); 
 				sws_scale(
 					convert_ctx, 
-					pFrame->data, 
-					pFrame->linesize, 
+					pF->data, 
+					pF->linesize, 
 					0, 
 					pCodecCtx->height, 
-					pFrameRGB->data, 
-					pFrameRGB->linesize
+					pFRGB->data, 
+					pFRGB->linesize
 				);
 				SaveFrame(
-					pFrame, 
+					pFRGB, 
 					pCodecCtx->width, 
 					pCodecCtx->height, 
 					cnt
 				);
-*/
 			}
 		}
 		av_free_packet(&packet);
