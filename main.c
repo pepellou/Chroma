@@ -22,7 +22,7 @@ IplImage* duplicate(
 	IplImage* out = cvCreateImage(
 		cvSize(2*in->width, 2*in->height),
 		IPL_DEPTH_8U,
-		3
+		in->nChannels
 	);
 	cvPyrUp(in, out);
 	return( out );
@@ -71,10 +71,40 @@ void fill_croma_from_border(
 	cvFloodFill(frame, border_point, color, threshold, threshold);
 }
 
-void sum_rgb( IplImage* src, IplImage* dst ) {
+void invert(
+	IplImage* src,
+	IplImage* dst
+) {
+	cvCopy(src, dst);
+	uchar *data = (uchar *)dst->imageData;
+	int i, j, k;
+	int width = src->width;
+	int height = src->height;
+	int channels = src->nChannels;
+	int step = src->widthStep;
+	for(i=0;i<height;i++)
+		for(j=0;j<width;j++)
+			for(k=0;k<channels;k++)
+				data[i*step+j*channels+k]=255-data[i*step+j*channels+k];
+}
+
+void sum_rgb(
+	IplImage* src, 
+	IplImage* dst 
+) {
 	IplImage* r = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
 	IplImage* g = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
 	IplImage* b = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+	IplImage* s_inv = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+
+	double w_r = 0.0;
+	double w_g = 100.0;
+	double w_b = 0.0;
+
+	double w_sum = w_r + w_g + w_b;
+	w_r /= w_sum;
+	w_g /= w_sum;
+	w_b /= w_sum;
 
 	// Split image onto the color planes.
 	cvSplit( src, r, g, b, NULL );
@@ -83,13 +113,29 @@ void sum_rgb( IplImage* src, IplImage* dst ) {
 	IplImage* s = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
 
 	// Add equally weighted rgb values.
-	cvAddWeighted( r, 1./3., g, 1./3., 0.0, s );
-	cvAddWeighted( s, 2./3., b, 1./3., 0.0, s );
+	cvAddWeighted( r, w_r, g, w_g, 0.0, s );
+	cvAddWeighted( s, w_r + w_g, b, w_b, 0.0, s );
 
-	// Truncate values above 100.
-	int thres = 100;
-	cvThreshold( s, dst, thres, thres, CV_THRESH_TOZERO );
-	cvThreshold( s, dst, thres, thres, CV_THRESH_BINARY );
+	cvAdaptiveThreshold( 
+		s, 
+		s, 
+		255, 
+		CV_ADAPTIVE_THRESH_MEAN_C,
+		CV_THRESH_BINARY,
+		71,
+		15		
+	);
+
+	invert(s, s_inv);
+
+	cvAnd( r, s, r );
+	cvAnd( g, s, g );
+	cvAnd( b, s, b );
+
+	cvMerge( r, g, b, NULL, dst );
+
+	//cvThreshold( s, dst, thres, thres, CV_THRESH_TOZERO );
+	cvReleaseImage(&s_inv);
 	cvReleaseImage(&r);
 	cvReleaseImage(&g);
 	cvReleaseImage(&b);
@@ -107,11 +153,11 @@ int main( int argc, char** argv ) {
 		if( !frame ) break;
 		putStar(frame);
 		//cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
+		IplImage* out = cvCreateImage( cvGetSize(frame), IPL_DEPTH_8U, 3 );
+		sum_rgb(frame, out);
 		//fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
 		//fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
-		IplImage* out = cvCreateImage( cvGetSize(frame), IPL_DEPTH_8U, 1 );
-		sum_rgb(frame, out);
-		cvShowImage( "KarapaKroma", out );
+		cvShowImage( "KarapaKroma", duplicate(out) );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
