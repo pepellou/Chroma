@@ -71,6 +71,31 @@ void fill_croma_from_border(
 	cvFloodFill(frame, border_point, color, threshold, threshold);
 }
 
+void sum_rgb( IplImage* src, IplImage* dst ) {
+	IplImage* r = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+	IplImage* g = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+	IplImage* b = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+
+	// Split image onto the color planes.
+	cvSplit( src, r, g, b, NULL );
+
+	// Temporary storage.
+	IplImage* s = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
+
+	// Add equally weighted rgb values.
+	cvAddWeighted( r, 1./3., g, 1./3., 0.0, s );
+	cvAddWeighted( s, 2./3., b, 1./3., 0.0, s );
+
+	// Truncate values above 100.
+	int thres = 100;
+	cvThreshold( s, dst, thres, thres, CV_THRESH_TOZERO );
+	cvThreshold( s, dst, thres, thres, CV_THRESH_BINARY );
+	cvReleaseImage(&r);
+	cvReleaseImage(&g);
+	cvReleaseImage(&b);
+	cvReleaseImage(&s);
+}
+
 int main( int argc, char** argv ) {
 	cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
 	g_capture = cvCreateCameraCapture( 0 );
@@ -81,10 +106,12 @@ int main( int argc, char** argv ) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
 		putStar(frame);
-		cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
-		fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
-		fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
-		cvShowImage( "KarapaKroma", duplicate(frame) );
+		//cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
+		//fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
+		//fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
+		IplImage* out = cvCreateImage( cvGetSize(frame), IPL_DEPTH_8U, 1 );
+		sum_rgb(frame, out);
+		cvShowImage( "KarapaKroma", out );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
