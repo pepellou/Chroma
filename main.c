@@ -50,6 +50,15 @@ void putStar(
 	cvPutText(frame, "Kroma", cvPoint(175,320), font, red);
 }
 
+void fill_croma_from_border(
+	IplImage* frame,
+	CvPoint border_point,
+	CvScalar color,
+	CvScalar threshold = cvScalar(4,4,4)
+) {
+	cvFloodFill(frame, border_point, color, threshold, threshold);
+}
+
 int main( int argc, char** argv ) {
 	cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
 	g_capture = cvCreateCameraCapture( 0 );
@@ -58,6 +67,9 @@ int main( int argc, char** argv ) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
 		putStar(frame);
+		fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
+		fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
+		fill_croma_from_border(frame, cvPoint(320,479), cvScalar(0,0,0), cvScalar(20,20,20));
 		cvShowImage( "KarapaKroma", smooth(frame) );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
