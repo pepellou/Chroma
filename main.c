@@ -16,6 +16,18 @@ IplImage* smooth(
 	return( out );
 };
 
+IplImage* duplicate(
+	IplImage* in
+) {
+	IplImage* out = cvCreateImage(
+		cvSize(2*in->width, 2*in->height),
+		IPL_DEPTH_8U,
+		3
+	);
+	cvPyrUp(in, out);
+	return( out );
+};
+
 void putStarPeak(
 	IplImage* frame,
 	CvPoint pt1,
@@ -64,17 +76,19 @@ int main( int argc, char** argv ) {
 	g_capture = cvCreateCameraCapture( 0 );
 	IplImage* frame;
 	IplImage* tempFrame;
+	IplConvKernel *kernel = cvCreateStructuringElementEx(5, 5, 2, 2, CV_SHAPE_RECT);
 	while(1) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
 		putStar(frame);
-		IplConvKernel *kernel = cvCreateStructuringElementEx(5, 5, 2, 2, CV_SHAPE_RECT);
 		cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
-		cvReleaseStructuringElement(&kernel);
-		cvShowImage( "KarapaKroma", frame );
+		fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
+		fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
+		cvShowImage( "KarapaKroma", duplicate(frame) );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
+	cvReleaseStructuringElement(&kernel);
 	cvReleaseCapture( &g_capture );
 	cvDestroyWindow( "KarapaKroma" );
 }
