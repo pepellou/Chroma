@@ -3,17 +3,16 @@
 
 CvCapture* g_capture = NULL;
 
-IplImage* doPyrDown(
-	IplImage* in,
-	int filter = IPL_GAUSSIAN_5x5
+IplImage* smooth(
+	IplImage* in
 ) {
-	assert( in->width%2 == 0 && in->height%2 == 0 );
 	IplImage* out = cvCreateImage(
-		cvSize( in->width/2, in->height/2 ),
-		in->depth,
-		in->nChannels
+		cvGetSize(in),
+		IPL_DEPTH_8U,
+		3
 	);
-	cvPyrDown( in, out );
+	cvSmooth( in, out, CV_GAUSSIAN, 17, 17 );
+
 	return( out );
 };
 
@@ -24,7 +23,7 @@ int main( int argc, char** argv ) {
 	while(1) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
-		cvShowImage( "KarapaKroma", doPyrDown(frame) );
+		cvShowImage( "KarapaKroma", smooth(frame) );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
