@@ -63,14 +63,15 @@ int main( int argc, char** argv ) {
 	cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
 	g_capture = cvCreateCameraCapture( 0 );
 	IplImage* frame;
+	IplImage* tempFrame;
 	while(1) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
 		putStar(frame);
-		fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
-		fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
-		fill_croma_from_border(frame, cvPoint(320,479), cvScalar(0,0,0), cvScalar(20,20,20));
-		cvShowImage( "KarapaKroma", smooth(frame) );
+		IplConvKernel *kernel = cvCreateStructuringElementEx(5, 5, 2, 2, CV_SHAPE_RECT);
+		cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
+		cvReleaseStructuringElement(&kernel);
+		cvShowImage( "KarapaKroma", frame );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
