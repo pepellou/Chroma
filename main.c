@@ -2,7 +2,7 @@
 
 int main( int argc, char** argv ) {
 	cvNamedWindow( "Example2", CV_WINDOW_AUTOSIZE );
-	CvCapture* capture = cvCreateFileCapture( argv[1] );
+	CvCapture* capture = cvCreateCameraCapture( 0 );
 	IplImage* frame;
 	while(1) {
 		frame = cvQueryFrame( capture );
