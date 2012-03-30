@@ -142,22 +142,86 @@ void sum_rgb(
 	cvReleaseImage(&s);
 }
 
+void MaxCanales (IplImage *color, IplImage *gris)
+// Dada una imagen con 3 canales, devuelve otra imagen con 1 canal
+// donde el valor de cada píxel es el máximo de los 3 canales de entrada
+{
+  IplImage *can1= cvCreateImage(cvGetSize(gris), IPL_DEPTH_8U, 1);
+  IplImage *can2= cvCreateImage(cvGetSize(gris), IPL_DEPTH_8U, 1);
+  cvSplit(color, gris, can1, can2, NULL);
+  cvMax(can1, can2, can1);
+  cvMax(can1, gris, gris);
+  cvReleaseImage(&can1);
+  cvReleaseImage(&can2);
+}
+
 int main( int argc, char** argv ) {
+	IplImage *nuevofondo= cvLoadImage("fondo.jpg");
 	cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
+	cvMoveWindow("KarapaKroma", 1, 1);
 	g_capture = cvCreateCameraCapture( 0 );
 	IplImage* frame;
 	IplImage* tempFrame;
 	IplConvKernel *kernel = cvCreateStructuringElementEx(5, 5, 2, 2, CV_SHAPE_RECT);
+
+	IplImage *img= cvQueryFrame(g_capture); 
+	if (!img) { 
+		cvReleaseCapture(&g_capture); 
+		return -1;
+	} 
+	IplImage *cop= cvCloneImage(img);     // Frame de entrada rectificado 
+	cop->origin= 0; 
+	IplImage *modelo= cvCloneImage(cop);  // Modelo de fondo (frame inicial) 
+	if (img->origin) 
+		cvFlip(modelo); 
+	modelo->origin= 0; 
+	IplImage *tmp= cvCloneImage(cop);     // Escalar el modelo de fondo 
+	cvResize(nuevofondo, tmp); 
+	cvReleaseImage(&nuevofondo); 
+	nuevofondo= tmp; 
+	IplImage *dif= cvCloneImage(cop);     // Imágenes de diferencia y máscara 
+	IplImage *masc= cvCreateImage(cvGetSize(cop), cop->depth, 1); 
+	int numf= 0; 
 	while(1) {
 		frame = cvQueryFrame( g_capture );
 		if( !frame ) break;
-		putStar(frame);
-		//cvMorphologyEx(frame, frame, tempFrame, kernel, CV_MOP_GRADIENT);
-		IplImage* out = cvCreateImage( cvGetSize(frame), IPL_DEPTH_8U, 3 );
-		sum_rgb(frame, out);
-		//fill_croma_from_border(frame, cvPoint(639,0), cvScalar(0,255,0));
-		//fill_croma_from_border(frame, cvPoint(0,0), cvScalar(0,255,0));
-		cvShowImage( "KarapaKroma", duplicate(out) );
+
+		if (img->origin==0)
+			cvCopy(img, cop);
+		else
+			cvFlip(img, cop);
+		cvNamedWindow("Entrada", 0);
+		cvMoveWindow("Entrada", 1, 350);
+		cvShowImage("Entrada", cop);
+		char tecla = tolower(cvWaitKey(1));
+		numf++;
+		if (numf==50) {
+			cvCopy(cop, modelo);
+		} else {
+			cvAddWeighted(modelo, (numf-1.0)/numf, cop, 1.0/numf, 0, modelo);
+		}
+		cvNamedWindow("Modelo", 0);
+		cvMoveWindow("Modelo", 400, 350);
+		cvShowImage("Modelo", modelo);
+		// 3.3. Calcular la diferencia de la imagen al modelo
+		cvAbsDiff(modelo, cop, dif);
+		MaxCanales(dif, masc);
+		cvNamedWindow("Diferencia", 0);
+		cvMoveWindow("Diferencia", 800, 350);
+		cvShowImage("Diferencia", masc);
+		// 3.4. Binarizar la diferencia para obtener la máscara
+		cvThreshold(masc, masc, 40, 255, CV_THRESH_BINARY);
+		cvNot(masc, masc);
+		// 3.5. Aplicar el nuevo fondo al resultado
+		cvCopy(nuevofondo, cop, masc);
+		putStar(cop);
+		cvNamedWindow("Salida", 0);
+		cvMoveWindow("Salida", 1, 700);
+		cvShowImage("Salida", cop);
+
+
+		//putStar(frame);
+		//cvShowImage( "KarapaKroma", duplicate(frame) );
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
