@@ -157,8 +157,8 @@ void MaxCanales (IplImage *color, IplImage *gris)
 
 int main( int argc, char** argv ) {
 	IplImage *nuevofondo= cvLoadImage("fondo.jpg");
-	cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
-	cvMoveWindow("KarapaKroma", 1, 1);
+	//cvNamedWindow( "KarapaKroma", CV_WINDOW_AUTOSIZE );
+	//cvMoveWindow("KarapaKroma", 1, 1);
 	g_capture = cvCreateCameraCapture( 0 );
 	IplImage* frame;
 	IplImage* tempFrame;
@@ -191,33 +191,33 @@ int main( int argc, char** argv ) {
 		else
 			cvFlip(img, cop);
 		cvNamedWindow("Entrada", 0);
-		cvMoveWindow("Entrada", 1, 350);
+		cvMoveWindow("Entrada", 1, 1);
 		cvShowImage("Entrada", cop);
 		char tecla = tolower(cvWaitKey(1));
 		numf++;
 		if (numf==50) {
 			cvCopy(cop, modelo);
 		} else {
-			cvAddWeighted(modelo, (numf-1.0)/numf, cop, 1.0/numf, 0, modelo);
+			//cvAddWeighted(modelo, (numf-1.0)/numf, cop, 1.0/numf, 0, modelo);
 		}
 		cvNamedWindow("Modelo", 0);
-		cvMoveWindow("Modelo", 400, 350);
+		cvMoveWindow("Modelo", 400, 1);
 		cvShowImage("Modelo", modelo);
 		// 3.3. Calcular la diferencia de la imagen al modelo
 		cvAbsDiff(modelo, cop, dif);
 		MaxCanales(dif, masc);
 		cvNamedWindow("Diferencia", 0);
-		cvMoveWindow("Diferencia", 800, 350);
+		cvMoveWindow("Diferencia", 800, 1);
 		cvShowImage("Diferencia", masc);
 		// 3.4. Binarizar la diferencia para obtener la máscara
 		cvThreshold(masc, masc, 40, 255, CV_THRESH_BINARY);
 		cvNot(masc, masc);
 		// 3.5. Aplicar el nuevo fondo al resultado
 		cvCopy(nuevofondo, cop, masc);
-		putStar(cop);
+		//putStar(cop);
 		cvNamedWindow("Salida", 0);
-		cvMoveWindow("Salida", 1, 700);
-		cvShowImage("Salida", cop);
+		cvMoveWindow("Salida", 400, 350);
+		cvShowImage("Salida", duplicate(cop));
 
 
 		//putStar(frame);
