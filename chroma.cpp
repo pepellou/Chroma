@@ -1,11 +1,17 @@
 #include "chroma.h"
 
-void Chroma::setName(
-	const char *name
+Chroma::Chroma(
 ) {
+	this->_name = "ChromaPrototype";
+}
+
+void Chroma::setName(
+	char *name
+) {
+	this->_name = name;
 }
 
 char *Chroma::name(
 ) {
-	return "OO";
+	return this->_name;
 }

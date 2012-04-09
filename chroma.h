@@ -2,8 +2,11 @@
 #define CHROMA_H
 
 class Chroma {
+	private:
+		char *_name;
 	public:
-		void setName(const char *name);
+		Chroma();
+		void setName(char *name);
 		char *name();
 };
 

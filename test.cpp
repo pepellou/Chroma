@@ -5,15 +5,20 @@ using namespace igloo;
 
 Describe(a_chroma) {
 
-	void SetUp() {
-		chroma.setName("Name");
-	}
-
-	It(has_a_name) {
-		Assert::That(chroma.name(), Equals("Blah"));
-	}
-
 	Chroma chroma;
+
+	void SetUp() {
+	}
+
+	It(has_a_name_that_can_be_set) {
+		char *aName = "aName";
+		chroma.setName(aName);
+		Assert::That(chroma.name(), Equals(aName));
+	}
+
+	It(has_a_default_name) {
+		Assert::That(chroma.name(), Equals("ChromaPrototype"));
+	}
 
 };
 
