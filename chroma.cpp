@@ -1,17 +1,19 @@
 #include "chroma.h"
 
+using namespace std;
+
 Chroma::Chroma(
 ) {
 	this->_name = "ChromaPrototype";
 }
 
 void Chroma::setName(
-	char *name
+	string name
 ) {
 	this->_name = name;
 }
 
-char *Chroma::name(
+string Chroma::name(
 ) {
 	return this->_name;
 }

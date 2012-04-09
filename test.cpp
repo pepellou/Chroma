@@ -2,6 +2,7 @@
 #include "chroma.h"
 
 using namespace igloo;
+using namespace std;
 
 Describe(a_chroma) {
 
@@ -11,7 +12,7 @@ Describe(a_chroma) {
 	}
 
 	It(has_a_name_that_can_be_set) {
-		char *aName = "aName";
+		string aName = "aName";
 		chroma.setName(aName);
 		Assert::That(chroma.name(), Equals(aName));
 	}

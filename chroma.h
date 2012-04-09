@@ -1,13 +1,15 @@
 #ifndef CHROMA_H
 #define CHROMA_H
 
+#include <string>
+
 class Chroma {
 	private:
-		char *_name;
+		std::string _name;
 	public:
 		Chroma();
-		void setName(char *name);
-		char *name();
+		void setName(std::string name);
+		std::string name();
 };
 
 #endif
