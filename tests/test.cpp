@@ -8,7 +8,10 @@ Describe(a_chroma) {
 
 	Chroma chroma;
 
+	const char *anAviFile;
+
 	void SetUp() {
+		anAviFile = "./tests/data/test.avi";
 	}
 
 	It(has_a_name_that_can_be_set) {
@@ -22,7 +25,7 @@ Describe(a_chroma) {
 	}
 
 	It(has_an_input_that_can_be_set) {
-		CvCapture* anInput = cvCreateCameraCapture( 0 );
+		CvCapture* anInput = cvCreateFileCapture(anAviFile);
 		chroma.setInput(anInput);
 		Assert::That(chroma.input(), Equals(anInput));
 	}
