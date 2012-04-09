@@ -8,10 +8,14 @@ Describe(a_chroma) {
 
 	Chroma chroma;
 
-	const char *anAviFile;
+	CvCapture *anAviFile;
 
 	void SetUp() {
-		anAviFile = "./tests/data/test.avi";
+		anAviFile = cvCreateFileCapture("./tests/data/test.avi");
+	}
+
+	void TearDown() {
+		cvReleaseCapture(&anAviFile);
 	}
 
 	It(has_a_name_that_can_be_set) {
@@ -25,7 +29,7 @@ Describe(a_chroma) {
 	}
 
 	It(has_an_input_that_can_be_set) {
-		CvCapture* anInput = cvCreateFileCapture(anAviFile);
+		CvCapture* anInput = anAviFile;
 		chroma.setInput(anInput);
 		Assert::That(chroma.input(), Equals(anInput));
 	}
