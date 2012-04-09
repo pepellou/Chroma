@@ -11,7 +11,7 @@ croma:
 
 test:
 	test -d build || mkdir build
-	g++ -pthread -Wall $(LIB) $(INC) -g chroma.cpp test.cpp -o build/test
+	g++ -pthread -Wall $(LIB) $(INC) -g chroma.cpp camera.cpp test.cpp -o build/test
 
 clean:
 	test -d build && rm -rf build || true

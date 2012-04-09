@@ -21,6 +21,16 @@ Describe(a_chroma) {
 		Assert::That(chroma.name(), Equals("ChromaPrototype"));
 	}
 
+	It(has_an_input_that_can_be_set) {
+		CvCapture* anInput = cvCreateCameraCapture( 0 );
+		chroma.setInput(anInput);
+		Assert::That(chroma.input(), Equals(anInput));
+	}
+
+	It(has_a_default_input) {
+		Assert::That(chroma.input(), Equals(Camera::theDefaultCamera()));
+	}
+
 };
 
 int main() { return TestRunner::RunAllTests(); }
