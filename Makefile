@@ -5,6 +5,7 @@ INC=-I/opt/local/include \
 	-Iinc
 
 SRC=src/chroma.cpp \
+	src/image.cpp \
 	src/camera.cpp
 
 TEST=tests/test.cpp
