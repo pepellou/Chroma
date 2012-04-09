@@ -30,6 +30,10 @@ CvCapture *Chroma::input(
 	return this->_input;
 }
 
+// --- UNTESTED CODE FROM THIS POINT DOWN ------------
+
+// --- LITTER FROM THIS POINT DOWN -------------------
+
 int Chroma::thisMethodShouldDie(
 ) {
 	CvCapture* camera = input();
