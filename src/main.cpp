@@ -161,7 +161,7 @@ int main( int argc, char** argv ) {
 		cvFlip(modelo); 
 	modelo->origin= 0; 
 	IplImage *tmp= cvCloneImage(cop);
-	IplImage *nuevofondo= cvLoadImage("fondo.jpg");
+	IplImage *nuevofondo= cvLoadImage("./tests/data/fondo.jpg");
 	cvResize(nuevofondo, tmp); 
 	cvReleaseImage(&nuevofondo); 
 	nuevofondo= tmp; 
