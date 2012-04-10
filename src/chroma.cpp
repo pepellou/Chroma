@@ -39,8 +39,7 @@ int Chroma::thisMethodShouldDie(
 	Camera* camera = input();
 	Image *img = new Image(cvQueryFrame(camera->cvCapture()));
 	if (!img->cvImage()) { 
-		CvCapture *cvCameraCapture = camera->cvCapture();
-		cvReleaseCapture(&cvCameraCapture); 
+		camera->release();
 		return -1;
 	} 
 	Image *cop = new Image(cvCloneImage(img->cvImage()));
@@ -94,8 +93,7 @@ int Chroma::thisMethodShouldDie(
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
-	CvCapture *cvCameraCapture = camera->cvCapture();
-	cvReleaseCapture(&cvCameraCapture); 
+	camera->release();
 	cvDestroyWindow( "KarapaKroma" );
 	return 0;
 }

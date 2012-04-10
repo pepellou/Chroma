@@ -22,3 +22,7 @@ Camera *Camera::theDefaultCamera(
 	return Camera::_theDefaultCamera;
 }
 
+void Camera::release(
+) {
+	cvReleaseCapture(&_cvCapture);
+}
