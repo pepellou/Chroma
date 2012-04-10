@@ -41,6 +41,17 @@ Image *Camera::grabCurrentFrame(
 	return this->_currentFrame;
 }
 
+Image *Camera::grabStaticScene(
+) {
+	Image *currentFrame = this->grabCurrentFrame();
+
+	Image *staticScene = currentFrame->clone();
+
+	staticScene->setOriginPosition(TOP_LEFT); 
+
+	return staticScene;
+}
+
 long Camera::processedFrames(
 ) {
 	return this->_processed_frames;

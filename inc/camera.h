@@ -14,6 +14,7 @@ class Camera {
 		static Camera *theDefaultCamera();
 		void release();
 		Image *grabCurrentFrame();
+		Image *grabStaticScene();
 		long processedFrames();
 
 	private:

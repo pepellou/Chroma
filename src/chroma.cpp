@@ -37,47 +37,33 @@ Camera *Chroma::input(
 
 int Chroma::thisMethodShouldDie(
 ) {
-	Camera* camera = input();
-	Image *currentFrame = camera->grabCurrentFrame();
-
-	if (!currentFrame->isValid()) { 
-		camera->release();
-		return -1;
-	} 
-
-	Image *cop = currentFrame->clone();
-	cop->setOriginPosition(TOP_LEFT); 
-
-	Image *staticScene = cop->clone();
-
-	if (currentFrame->originPosition() == BOTTOM_LEFT) 
-		staticScene->flip();
-
-	staticScene->setOriginPosition(TOP_LEFT); 
-
-	Image *background = new Image("./tests/data/fondo.jpg");
-	background->resizeLike(cop);
-
 	Window *wEntrada = new Window((char *) "Entrada", 1, 1);
 	Window *wModelo = new Window((char *) "Modelo", 400, 1);
 	Window *wDiferencia = new Window((char *) "Diferencia", 800, 1);
 	Window *wSalida = new Window((char *) "Salida", 400, 350);
 
+	Camera* camera = input();
+
+	Image *staticScene = camera->grabStaticScene();
+
+	Image *background = new Image("./tests/data/fondo.jpg");
+	background->resizeLike(staticScene);
+
+
 	while(1) {
-		camera->grabCurrentFrame();
+		Image *inputSignal = camera->grabCurrentFrame();
 
-		currentFrame->cloneTo(cop);
-		if (currentFrame->originPosition() == BOTTOM_LEFT)
-			cop->flip();
+		if (inputSignal->originPosition() == BOTTOM_LEFT)
+			inputSignal->flip();
 
-		wEntrada->renderImage(cop);
+		wEntrada->renderImage(inputSignal);
 
 		if (camera->processedFrames() == 50) {
-			cop->cloneTo(staticScene);
+			inputSignal->cloneTo(staticScene);
 		}
 		wModelo->renderImage(staticScene);
 
-		Image *difference = staticScene->differenceWith(cop);
+		Image *difference = staticScene->differenceWith(inputSignal);
 		Image *mask = difference->mergeChannelsToMaximum();
 
 		difference->release();
@@ -86,10 +72,10 @@ int Chroma::thisMethodShouldDie(
 
 		mask->binarize();
 		mask->negativize();
-		background->cloneTo(cop, mask);
+		background->cloneTo(inputSignal, mask);
 		mask->release();
 
-		wSalida->renderImage(cop);
+		wSalida->renderImage(inputSignal);
 
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
