@@ -5,7 +5,7 @@ Window::Window(
 	int x,
 	int y
 ) {
-	cvNamedWindow(name, 0);
+	cvNamedWindow(name, CV_WINDOW_AUTOSIZE);
 	cvMoveWindow(name, x, y);
 	this->_name = name;
 }

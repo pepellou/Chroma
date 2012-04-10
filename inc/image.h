@@ -37,6 +37,7 @@ class Image {
 		void binarize();
 		void negativize();
 		Image *cleanIsolatedDots();
+		Image *duplicate();
 
 	private:
 		IplImage *_cvImage;

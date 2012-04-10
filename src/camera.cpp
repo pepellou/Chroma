@@ -19,7 +19,7 @@ Camera *Camera::theDefaultCamera(
 ) {
 	if (Camera::_theDefaultCamera == NULL) {
 		Camera::_theDefaultCamera = 
-			new Camera(cvCreateCameraCapture(0));
+			new Camera(cvCreateCameraCapture(1));
 	}
 	return Camera::_theDefaultCamera;
 }

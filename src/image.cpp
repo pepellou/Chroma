@@ -169,6 +169,7 @@ void Image::negativize(
 Image *Image::cleanIsolatedDots(
 ) {
 	Image *clean = this->clone();
+return clean;
 	uchar *dataIn  = (uchar *) this->_cvImage->imageData;
 	uchar *dataOut = (uchar *) clean->_cvImage->imageData;
 	int y, x, c;
@@ -208,4 +209,16 @@ Image *Image::cleanIsolatedDots(
 		}
 	}
 	return clean;
+}
+
+Image *Image::duplicate(
+) {
+	IplImage *in = _cvImage;
+	IplImage* out = cvCreateImage(
+		cvSize(2*in->width, 2*in->height),
+		IPL_DEPTH_8U,
+		in->nChannels
+	);
+	cvPyrUp(in, out);
+	return new Image(out);
 }

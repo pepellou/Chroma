@@ -37,11 +37,11 @@ Camera *Chroma::input(
 
 int Chroma::thisMethodShouldDie(
 ) {
-	Window *wInput     = new Window((char *) "Entrada",             1,   1);
-	Window *wModel     = new Window((char *) "Modelo",            400,   1);
-	Window *wMask      = new Window((char *) "Diferencia",        800,   1);
-	Window *wCleanMask = new Window((char *) "Diferencia limpia", 800, 350);
-	Window *wOutput    = new Window((char *) "Salida",            400, 350);
+	Window *wInput     = new Window((char *) "Entrada",              1,   1);
+	Window *wModel     = new Window((char *) "Modelo",             400,   1);
+	Window *wMask      = new Window((char *) "Diferencia",         800,   1);
+	Window *wCleanMask = new Window((char *) "Diferencia limpia", 1200,   1);
+	Window *wOutput    = new Window((char *) "Salida",             400, 350);
 
 	Camera* camera = input();
 
@@ -78,8 +78,12 @@ int Chroma::thisMethodShouldDie(
 		wModel->renderImage(staticScene);
 		wMask->renderImage(mask);
 		wCleanMask->renderImage(cleanMask);
-		wOutput->renderImage(outputSignal);
 
+		Image *double_sized = outputSignal->duplicate();
+
+		wOutput->renderImage(double_sized);
+
+		double_sized->release();
 		mask->release();
 		cleanMask->release();
 		difference->release();
