@@ -51,8 +51,7 @@ int Chroma::thisMethodShouldDie(
 	Image *tmp = new Image(cvCloneImage(cop->cvImage()));
 	Image *nuevofondo = new Image(cvLoadImage("./tests/data/fondo.jpg"));
 	cvResize(nuevofondo->cvImage(), tmp->cvImage()); 
-	IplImage *fondoCvImage = nuevofondo->cvImage();
-	cvReleaseImage(&fondoCvImage);
+	nuevofondo->release();
 	nuevofondo -> setCvImage(tmp->cvImage());
 	Image *dif = new Image(cvCloneImage(cop->cvImage()));
 	Image *masc = new Image(cvCreateImage(cvGetSize(cop->cvImage()), cop->cvImage()->depth, 1));
@@ -226,27 +225,21 @@ void Chroma::sum_rgb(
 
 	cvMerge( r->cvImage(), g->cvImage(), b->cvImage(), NULL, dst->cvImage() );
 
-	IplImage *cvS_inv = s_inv->cvImage();
-	IplImage *cvR = r->cvImage();
-	IplImage *cvG = g->cvImage();
-	IplImage *cvB = b->cvImage();
-	IplImage *cvS = s->cvImage();
-
-	cvReleaseImage(&cvS_inv);
-	cvReleaseImage(&cvR);
-	cvReleaseImage(&cvG);
-	cvReleaseImage(&cvB);
-	cvReleaseImage(&cvS);
+	s_inv->release();
+	r->release();
+	g->release();
+	b->release();
+	s->release();
 }
 
 void Chroma::MaxCanales(Image *color, Image *gris)
 {
-	IplImage *can1 = cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1);
-	IplImage *can2= cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1);
-	cvSplit(color->cvImage(), gris->cvImage(), can1, can2, NULL);
-	cvMax(can1, can2, can1);
-	cvMax(can1, gris->cvImage(), gris->cvImage());
-	cvReleaseImage(&can1);
-	cvReleaseImage(&can2);
+	Image *can1 = new Image(cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1));
+	Image *can2 = new Image(cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1));
+	cvSplit(color->cvImage(), gris->cvImage(), can1->cvImage(), can2->cvImage(), NULL);
+	cvMax(can1->cvImage(), can2->cvImage(), can1->cvImage());
+	cvMax(can1->cvImage(), gris->cvImage(), gris->cvImage());
+	can1->release();
+	can2->release();
 }
 

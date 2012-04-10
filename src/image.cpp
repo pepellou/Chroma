@@ -16,3 +16,8 @@ void Image::setCvImage(
 ) {
 	this->_cvImage = cvImage;
 }
+
+void Image::release(
+) {
+	cvReleaseImage(&_cvImage);
+}
