@@ -18,7 +18,7 @@ class Image {
 			CvScalar color,
 			CvScalar threshold
 		);
-		void invert(Image *src, Image *dst);
+		Image *invert();
 
 	private:
 		IplImage *_cvImage;

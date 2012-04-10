@@ -138,7 +138,6 @@ void Chroma::sum_rgb(
 	Image* r = new Image(cvCreateImage( cvGetSize(src->cvImage()), IPL_DEPTH_8U, 1 ));
 	Image* g = new Image(cvCreateImage( cvGetSize(src->cvImage()), IPL_DEPTH_8U, 1 ));
 	Image* b = new Image(cvCreateImage( cvGetSize(src->cvImage()), IPL_DEPTH_8U, 1 ));
-	Image* s_inv = new Image( cvCreateImage( cvGetSize(src->cvImage()), IPL_DEPTH_8U, 1 ));
 
 	double w_r = 0.0;
 	double w_g = 100.0;
@@ -166,7 +165,7 @@ void Chroma::sum_rgb(
 		15		
 	);
 
-	s->invert(s, s_inv);
+	Image *s_inv = s->invert();
 
 	cvAnd( r->cvImage(), s->cvImage(), r->cvImage() );
 	cvAnd( g->cvImage(), s->cvImage(), g->cvImage() );

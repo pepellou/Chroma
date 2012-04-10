@@ -53,20 +53,27 @@ void Image::fillColor(
 	cvFloodFill(_cvImage, startPoint, color, threshold, threshold);
 }
 
-void Image::invert(
-	Image *src,
-	Image *dst
+Image *Image::invert(
 ) {
-	cvCopy(src->cvImage(), dst->cvImage());
-	uchar *data = (uchar *)dst->cvImage()->imageData;
+	IplImage *inverted = cvCreateImage( 
+		cvGetSize(_cvImage), 
+		IPL_DEPTH_8U, 
+		1 
+	);
+	cvCopy(_cvImage, inverted);
+	uchar *data = (uchar *) inverted->imageData;
 	int i, j, k;
-	int width = src->cvImage()->width;
-	int height = src->cvImage()->height;
-	int channels = src->cvImage()->nChannels;
-	int step = src->cvImage()->widthStep;
-	for(i=0;i<height;i++)
-		for(j=0;j<width;j++)
-			for(k=0;k<channels;k++)
-				data[i*step+j*channels+k]=255-data[i*step+j*channels+k];
+	for (i = 0; i < _cvImage->height; i++) {
+		for(j = 0 ; j < _cvImage->width; j++) {
+			for(k = 0 ; k < _cvImage->nChannels; k++) {
+				int index = i * _cvImage->widthStep
+					+ j * _cvImage->nChannels 
+					+ k;
+				data[index] = 255 - data[index];
+			}
+		}
+	}
+
+	return new Image(inverted);
 }
 
