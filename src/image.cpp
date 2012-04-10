@@ -53,3 +53,20 @@ void Image::fillColor(
 	cvFloodFill(_cvImage, startPoint, color, threshold, threshold);
 }
 
+void Image::invert(
+	Image *src,
+	Image *dst
+) {
+	cvCopy(src->cvImage(), dst->cvImage());
+	uchar *data = (uchar *)dst->cvImage()->imageData;
+	int i, j, k;
+	int width = src->cvImage()->width;
+	int height = src->cvImage()->height;
+	int channels = src->cvImage()->nChannels;
+	int step = src->cvImage()->widthStep;
+	for(i=0;i<height;i++)
+		for(j=0;j<width;j++)
+			for(k=0;k<channels;k++)
+				data[i*step+j*channels+k]=255-data[i*step+j*channels+k];
+}
+

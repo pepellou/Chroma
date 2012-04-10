@@ -131,23 +131,6 @@ void Chroma::putStar(
 	cvPutText(frame->cvImage(), "Kroma", cvPoint(175,320), font, red);
 }
 
-void Chroma::invert(
-	Image *src,
-	Image *dst
-) {
-	cvCopy(src->cvImage(), dst->cvImage());
-	uchar *data = (uchar *)dst->cvImage()->imageData;
-	int i, j, k;
-	int width = src->cvImage()->width;
-	int height = src->cvImage()->height;
-	int channels = src->cvImage()->nChannels;
-	int step = src->cvImage()->widthStep;
-	for(i=0;i<height;i++)
-		for(j=0;j<width;j++)
-			for(k=0;k<channels;k++)
-				data[i*step+j*channels+k]=255-data[i*step+j*channels+k];
-}
-
 void Chroma::sum_rgb(
 	Image *src, 
 	Image *dst 
@@ -183,7 +166,7 @@ void Chroma::sum_rgb(
 		15		
 	);
 
-	invert(s, s_inv);
+	s->invert(s, s_inv);
 
 	cvAnd( r->cvImage(), s->cvImage(), r->cvImage() );
 	cvAnd( g->cvImage(), s->cvImage(), g->cvImage() );
