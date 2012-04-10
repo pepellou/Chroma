@@ -37,10 +37,11 @@ Camera *Chroma::input(
 
 int Chroma::thisMethodShouldDie(
 ) {
-	Window *wEntrada = new Window((char *) "Entrada", 1, 1);
-	Window *wModelo = new Window((char *) "Modelo", 400, 1);
-	Window *wDiferencia = new Window((char *) "Diferencia", 800, 1);
-	Window *wSalida = new Window((char *) "Salida", 400, 350);
+	Window *wInput     = new Window((char *) "Entrada",             1,   1);
+	Window *wModel     = new Window((char *) "Modelo",            400,   1);
+	Window *wMask      = new Window((char *) "Diferencia",        800,   1);
+	Window *wCleanMask = new Window((char *) "Diferencia limpia", 800, 350);
+	Window *wOutput    = new Window((char *) "Salida",            400, 350);
 
 	Camera* camera = input();
 
@@ -66,18 +67,21 @@ int Chroma::thisMethodShouldDie(
 		Image *difference = staticScene->differenceWith(inputSignal);
 		Image *mask = difference->mergeChannelsToMaximum();
 
-		difference->release();
-
 		mask->binarize();
 		mask->negativize();
-		background->cloneTo(outputSignal, mask);
 
-		wEntrada->renderImage(inputSignal);
-		wModelo->renderImage(staticScene);
-		wDiferencia->renderImage(mask);
-		wSalida->renderImage(outputSignal);
+		Image *cleanMask = mask->cleanIsolatedDots();
+
+		background->cloneTo(outputSignal, cleanMask);
+
+		wInput->renderImage(inputSignal);
+		wModel->renderImage(staticScene);
+		wMask->renderImage(mask);
+		wCleanMask->renderImage(cleanMask);
+		wOutput->renderImage(outputSignal);
 
 		mask->release();
+		cleanMask->release();
 		difference->release();
 		outputSignal->release();
 

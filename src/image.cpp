@@ -165,3 +165,48 @@ void Image::negativize(
 ) {
 	cvNot(_cvImage, _cvImage);
 }
+
+Image *Image::cleanIsolatedDots(
+) {
+	Image *clean = this->clone();
+	uchar *dataIn  = (uchar *) this->_cvImage->imageData;
+	uchar *dataOut = (uchar *) clean->_cvImage->imageData;
+	int y, x, c;
+	int width = _cvImage->width;
+	int height = _cvImage->height;
+	int channels = _cvImage->nChannels;
+	int step = _cvImage->widthStep;
+	for (y = 0; y < height; y++) {
+		for (x = 0; x < width; x++) {
+			for (c = 0; c < channels; c++) {
+				int index = y * step
+					+ x * channels + c;
+				int new_color = dataIn[index];
+
+				int around_points[][2] = {
+					{-1, 0}, {-1, -1}, {0, -1}, {1, -1},
+					{1, 0},  {1, 1},   {0, 1},  {-1, 1}
+				};
+				int same_around = 0, count_around = 0;
+				int total_around = sizeof(around_points) / sizeof(int);
+				int point;
+				for (point = 0; point < total_around; point++) {
+					int nx = x + around_points[point][0];
+					int ny = y + around_points[point][1];
+					if (nx < width && nx >= 0 && ny < height && ny >= 0) {
+						count_around++;
+						int new_index = ny * step + nx * channels + c;
+						if (dataIn[new_index] == new_color)
+							same_around++;
+					}
+				}
+
+				if (same_around * 1.0 / count_around > 0.5)
+					dataOut[index] = new_color;
+				else
+					dataOut[index] = 255 - new_color;
+			}
+		}
+	}
+	return clean;
+}

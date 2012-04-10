@@ -36,6 +36,7 @@ class Image {
 		Image *mergeChannelsToMaximum();
 		void binarize();
 		void negativize();
+		Image *cleanIsolatedDots();
 
 	private:
 		IplImage *_cvImage;
