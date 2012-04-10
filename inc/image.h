@@ -11,14 +11,6 @@ class Image {
 		IplImage *cvImage();
 		void setCvImage(IplImage *cvImage);
 		void release();
-		Image *smooth();
-		Image *duplicate();
-		void fillColor(
-			CvPoint startPoint,
-			CvScalar color,
-			CvScalar threshold
-		);
-		Image *invert();
 
 	private:
 		IplImage *_cvImage;
