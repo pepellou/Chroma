@@ -7,6 +7,7 @@ Camera::Camera(
 ) {
 	this->_cvCapture = cvCapture;
 	this->_currentFrame = NULL;
+	this->_processed_frames = 0;
 }
 
 CvCapture *Camera::cvCapture(
@@ -36,5 +37,11 @@ Image *Camera::grabCurrentFrame(
 			currentCvFrame
 		);
 	}
+	this->_processed_frames++;
 	return this->_currentFrame;
+}
+
+long Camera::processedFrames(
+) {
+	return this->_processed_frames;
 }

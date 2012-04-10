@@ -14,11 +14,13 @@ class Camera {
 		static Camera *theDefaultCamera();
 		void release();
 		Image *grabCurrentFrame();
+		long processedFrames();
 
 	private:
 		static Camera *_theDefaultCamera;
 		CvCapture *_cvCapture;
 		Image *_currentFrame;
+		long _processed_frames;
 
 };
 
