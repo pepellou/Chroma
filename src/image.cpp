@@ -39,23 +39,38 @@ Image *Image::clone(
 }
 
 Image *Image::cloneJustDimensions(
-	int num_channels = -1
+	int num_channels,
+	int depth
 ) {
+	if (depth == -1)
+		depth = _cvImage->depth;
 	if (num_channels == -1)
 		num_channels = _cvImage->nChannels;
 	return new Image(
 		cvCreateImage(
 			cvGetSize(_cvImage), 
-			_cvImage->depth, 
+			depth, 
 			num_channels
 		)
 	);
 }
 
 void Image::cloneTo(
-	Image *anotherImage
+	Image *anotherImage,
+	Image *mask
 ) {
-	cvCopy(_cvImage, anotherImage->_cvImage);
+	if (mask == NULL) {
+		cvCopy(
+			_cvImage, 
+			anotherImage->_cvImage
+		);
+	} else {
+		cvCopy(
+			_cvImage, 
+			anotherImage->_cvImage, 
+			mask->_cvImage
+		);
+	}
 }
 
 void Image::flip(
@@ -81,4 +96,56 @@ void Image::setOriginPosition(
 	int position
 ) {
 	_cvImage->origin = position;
+}
+
+Image *Image::differenceWith(
+	Image *anotherImage
+) {
+	Image *difference = anotherImage->clone();
+	cvAbsDiff(
+		_cvImage, 
+		anotherImage->_cvImage, 
+		difference->_cvImage
+	);
+	return difference;
+}
+
+void Image::splitTo(
+	Image *channel1,
+	Image *channel2,
+	Image *channel3
+) {
+	cvSplit(
+		_cvImage, 
+		channel1->_cvImage, 
+		channel2->_cvImage, 
+		channel3->_cvImage, 
+		NULL
+	);
+}
+
+Image *Image::mergeToMaximumWith(
+	Image *anotherImage
+) {
+	Image *maximum = anotherImage->clone();
+	cvMax(_cvImage, anotherImage->_cvImage, maximum->_cvImage);
+	return maximum;
+}
+
+Image *Image::mergeChannelsToMaximum() {
+	Image *channel1 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel2 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel3 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+
+	this->splitTo(channel1, channel2, channel3);
+
+	Image *max1and2 = channel1->mergeToMaximumWith(channel2);
+	Image *maxAll = max1and2->mergeToMaximumWith(channel3);
+
+	max1and2->release();
+	channel1->release();
+	channel2->release();
+	channel3->release();
+
+	return maxAll;
 }

@@ -45,3 +45,4 @@ long Camera::processedFrames(
 ) {
 	return this->_processed_frames;
 }
+

@@ -42,7 +42,6 @@ class Chroma {
 		);
 		void invert(Image* src, Image* dst);
 		void sum_rgb(Image* src, Image* dst);
-		void MaxCanales(Image *color, Image *gris);
 
 };
 

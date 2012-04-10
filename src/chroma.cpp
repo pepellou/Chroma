@@ -48,25 +48,21 @@ int Chroma::thisMethodShouldDie(
 	Image *cop = currentFrame->clone();
 	cop->setOriginPosition(TOP_LEFT); 
 
-	Image *modelo = cop->clone();
+	Image *staticScene = cop->clone();
 
 	if (currentFrame->originPosition() == BOTTOM_LEFT) 
-		modelo->flip();
+		staticScene->flip();
 
-	modelo->setOriginPosition(TOP_LEFT); 
+	staticScene->setOriginPosition(TOP_LEFT); 
 
 	Image *background = new Image("./tests/data/fondo.jpg");
 	background->resizeLike(cop);
-
-	Image *difference = cop->clone();
-	Image *mask = cop->cloneJustDimensions(1);
 
 	Window *wEntrada = new Window((char *) "Entrada", 1, 1);
 	Window *wModelo = new Window((char *) "Modelo", 400, 1);
 	Window *wDiferencia = new Window((char *) "Diferencia", 800, 1);
 	Window *wSalida = new Window((char *) "Salida", 400, 350);
 
-	int numf= 0; 
 	while(1) {
 		camera->grabCurrentFrame();
 
@@ -76,19 +72,23 @@ int Chroma::thisMethodShouldDie(
 
 		wEntrada->renderImage(cop);
 
-		numf++;
-		if (numf == 50) {
-			cop->cloneTo(modelo);
+		if (camera->processedFrames() == 50) {
+			cop->cloneTo(staticScene);
 		}
-		wModelo->renderImage(modelo);
+		wModelo->renderImage(staticScene);
 
-		cvAbsDiff(modelo->cvImage(), cop->cvImage(), difference->cvImage());
-		MaxCanales(difference, mask);
+		Image *difference = staticScene->differenceWith(cop);
+		Image *mask = difference->mergeChannelsToMaximum();
+
+		difference->release();
+
 		wDiferencia->renderImage(mask);
 
 		cvThreshold(mask->cvImage(), mask->cvImage(), 40, 255, CV_THRESH_BINARY);
 		cvNot(mask->cvImage(), mask->cvImage());
 		cvCopy(background->cvImage(), cop->cvImage(), mask->cvImage());
+		mask->release();
+
 		wSalida->renderImage(cop);
 
 		char c = cvWaitKey(33);
@@ -98,15 +98,3 @@ int Chroma::thisMethodShouldDie(
 	cvDestroyWindow( "KarapaKroma" );
 	return 0;
 }
-
-void Chroma::MaxCanales(Image *color, Image *gris)
-{
-	Image *can1 = new Image(cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1));
-	Image *can2 = new Image(cvCreateImage(cvGetSize(gris->cvImage()), IPL_DEPTH_8U, 1));
-	cvSplit(color->cvImage(), gris->cvImage(), can1->cvImage(), can2->cvImage(), NULL);
-	cvMax(can1->cvImage(), can2->cvImage(), can1->cvImage());
-	cvMax(can1->cvImage(), gris->cvImage(), gris->cvImage());
-	can1->release();
-	can2->release();
-}
-

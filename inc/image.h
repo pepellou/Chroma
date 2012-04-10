@@ -17,12 +17,23 @@ class Image {
 		void release();
 		bool isValid();
 		Image *clone();
-		Image *cloneJustDimensions(int num_channels);
-		void cloneTo(Image *anotherImage);
+		Image *cloneJustDimensions(int num_channels = -1, int depth = -1);
+		void cloneTo(
+			Image *anotherImage,
+			Image *mask = NULL
+		);
+		void splitTo(
+			Image *channel1,
+			Image *channel2,
+			Image *channel3
+		);
 		void flip();
 		void resizeLike(Image *otherImage);
 		int originPosition();
 		void setOriginPosition(int position);
+		Image *differenceWith(Image *anotherImage);
+		Image *mergeToMaximumWith(Image *anotherImage);
+		Image *mergeChannelsToMaximum();
 
 	private:
 		IplImage *_cvImage;
