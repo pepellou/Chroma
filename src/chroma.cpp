@@ -37,7 +37,7 @@ Camera *Chroma::input(
 int Chroma::thisMethodShouldDie(
 ) {
 	Camera* camera = input();
-	Image *img = new Image(cvQueryFrame(camera->cvCapture()));
+	Image *img = camera->grabCurrentFrame();
 	if (!img->cvImage()) { 
 		camera->release();
 		return -1;
@@ -57,7 +57,7 @@ int Chroma::thisMethodShouldDie(
 	Image *masc = new Image(cvCreateImage(cvGetSize(cop->cvImage()), cop->cvImage()->depth, 1));
 	int numf= 0; 
 	while(1) {
-		cvQueryFrame( camera->cvCapture() );
+		camera->grabCurrentFrame();
 
 		if (img->cvImage()->origin==0)
 			cvCopy(img->cvImage(), cop->cvImage());

@@ -6,6 +6,7 @@ Camera::Camera(
 	CvCapture *cvCapture
 ) {
 	this->_cvCapture = cvCapture;
+	this->_currentFrame = NULL;
 }
 
 CvCapture *Camera::cvCapture(
@@ -25,4 +26,16 @@ Camera *Camera::theDefaultCamera(
 void Camera::release(
 ) {
 	cvReleaseCapture(&_cvCapture);
+}
+
+Image *Camera::grabCurrentFrame(
+) {
+	if (this->_currentFrame == NULL) {
+		this->_currentFrame = new Image(
+			cvQueryFrame(_cvCapture)
+		);
+	} else {
+		cvQueryFrame(_cvCapture);
+	}
+	return this->_currentFrame;
 }

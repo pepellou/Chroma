@@ -4,6 +4,8 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
+#include "image.h"
+
 class Camera {
 
 	public:
@@ -11,10 +13,12 @@ class Camera {
 		CvCapture *cvCapture();
 		static Camera *theDefaultCamera();
 		void release();
+		Image *grabCurrentFrame();
 
 	private:
 		static Camera *_theDefaultCamera;
 		CvCapture *_cvCapture;
+		Image *_currentFrame;
 
 };
 
