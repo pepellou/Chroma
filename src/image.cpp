@@ -21,3 +21,16 @@ void Image::release(
 ) {
 	cvReleaseImage(&_cvImage);
 }
+
+Image *Image::smooth(
+	Image *in
+) {
+	Image *out = new Image(cvCreateImage(
+		cvGetSize(in),
+		IPL_DEPTH_8U,
+		3
+	));
+	cvSmooth( in->cvImage(), out->cvImage(), CV_GAUSSIAN, 3, 3 );
+
+	return out;
+}

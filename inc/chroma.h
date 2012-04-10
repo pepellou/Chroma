@@ -25,7 +25,6 @@ class Chroma {
 		std::string _name;
 		Camera *_input;
 
-		Image *smooth(Image *in);
 		Image *duplicate(Image *in);
 		void putStar(Image* frame);
 		void putStarPeak(

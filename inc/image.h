@@ -11,6 +11,7 @@ class Image {
 		IplImage *cvImage();
 		void setCvImage(IplImage *cvImage);
 		void release();
+		Image *smooth(Image *in);
 
 	private:
 		IplImage *_cvImage;
