@@ -1,12 +1,23 @@
 #include "camera.h"
 
-CvCapture *Camera::_theDefaultCamera = NULL;
+Camera *Camera::_theDefaultCamera = NULL;
 
-CvCapture *Camera::theDefaultCamera(
+Camera::Camera(
+	CvCapture *cvCapture
+) {
+	this->_cvCapture = cvCapture;
+}
+
+CvCapture *Camera::cvCapture(
+) {
+	return this->_cvCapture;
+}
+
+Camera *Camera::theDefaultCamera(
 ) {
 	if (Camera::_theDefaultCamera == NULL) {
 		Camera::_theDefaultCamera = 
-			cvCreateCameraCapture(0);
+			new Camera(cvCreateCameraCapture(0));
 	}
 	return Camera::_theDefaultCamera;
 }

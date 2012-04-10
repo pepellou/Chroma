@@ -14,16 +14,16 @@ class Chroma {
 		Chroma();
 
 		std::string name();
-		CvCapture *input();
+		Camera *input();
 
 		void setName(std::string name);
-		void setInput(CvCapture *input);
+		void setInput(Camera *input);
 
 		int thisMethodShouldDie();
 
 	private:
 		std::string _name;
-		CvCapture *_input;
+		Camera *_input;
 
 		Image *smooth(Image *in);
 		Image *duplicate(Image *in);

@@ -7,10 +7,13 @@
 class Camera {
 
 	public:
-		static CvCapture *theDefaultCamera();
+		Camera(CvCapture *cvCapture);
+		CvCapture *cvCapture();
+		static Camera *theDefaultCamera();
 
 	private:
-		static CvCapture *_theDefaultCamera;
+		static Camera *_theDefaultCamera;
+		CvCapture *_cvCapture;
 
 };
 

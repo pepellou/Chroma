@@ -29,7 +29,7 @@ Describe(a_chroma) {
 	}
 
 	It(has_an_input_that_can_be_set) {
-		CvCapture* anInput = anAviFile;
+		Camera* anInput = new Camera(anAviFile);
 		chroma.setInput(anInput);
 		Assert::That(chroma.input(), Equals(anInput));
 	}

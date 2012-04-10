@@ -20,12 +20,12 @@ string Chroma::name(
 }
 
 void Chroma::setInput(
-	CvCapture *input
+	Camera *input
 ) {
 	this->_input = input;
 }
 
-CvCapture *Chroma::input(
+Camera *Chroma::input(
 ) {
 	return this->_input;
 }
@@ -36,10 +36,11 @@ CvCapture *Chroma::input(
 
 int Chroma::thisMethodShouldDie(
 ) {
-	CvCapture* camera = input();
-	Image *img = new Image(cvQueryFrame(camera));
+	Camera* camera = input();
+	Image *img = new Image(cvQueryFrame(camera->cvCapture()));
 	if (!img->cvImage()) { 
-		cvReleaseCapture(&camera); 
+		CvCapture *cvCameraCapture = camera->cvCapture();
+		cvReleaseCapture(&cvCameraCapture); 
 		return -1;
 	} 
 	Image *cop = new Image(cvCloneImage(img->cvImage()));
@@ -60,7 +61,7 @@ int Chroma::thisMethodShouldDie(
 	// CAN REMOVE??
 	Image* frame;
 	while(1) {
-		frame = new Image(cvQueryFrame( camera ) );
+		frame = new Image(cvQueryFrame( camera->cvCapture() ) );
 		if( !(frame->cvImage()) ) break;
 
 		if (img->cvImage()->origin==0)
@@ -93,7 +94,8 @@ int Chroma::thisMethodShouldDie(
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
-	cvReleaseCapture( &camera );
+	CvCapture *cvCameraCapture = camera->cvCapture();
+	cvReleaseCapture(&cvCameraCapture); 
 	cvDestroyWindow( "KarapaKroma" );
 	return 0;
 }
