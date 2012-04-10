@@ -6,6 +6,7 @@
 #include <opencv/highgui.h>
 
 #include "camera.h"
+#include "image.h"
 
 class Chroma {
 
@@ -24,11 +25,11 @@ class Chroma {
 		std::string _name;
 		CvCapture *_input;
 
-		IplImage *smooth(IplImage *in);
-		IplImage *duplicate(IplImage *in);
-		void putStar(IplImage* frame);
+		Image *smooth(Image *in);
+		Image *duplicate(Image *in);
+		void putStar(Image* frame);
 		void putStarPeak(
-			IplImage* frame,
+			Image* frame,
 			CvPoint pt1,
 			CvPoint pt2,
 			CvPoint pt3,
@@ -36,14 +37,14 @@ class Chroma {
 			CvScalar color
 		);
 		void fill_croma_from_border(
-			IplImage* frame,
+			Image* frame,
 			CvPoint border_point,
 			CvScalar color,
 			CvScalar threshold = cvScalar(4,4,4)
 		);
-		void invert(IplImage* src, IplImage* dst);
-		void sum_rgb(IplImage* src, IplImage* dst);
-		void MaxCanales(IplImage *color, IplImage *gris);
+		void invert(Image* src, Image* dst);
+		void sum_rgb(Image* src, Image* dst);
+		void MaxCanales(Image *color, Image *gris);
 
 };
 

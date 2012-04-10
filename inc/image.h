@@ -9,6 +9,7 @@ class Image {
 	public:
 		Image(IplImage *cvImage);
 		IplImage *cvImage();
+		void setCvImage(IplImage *cvImage);
 
 	private:
 		IplImage *_cvImage;

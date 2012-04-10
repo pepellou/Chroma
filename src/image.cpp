@@ -10,3 +10,9 @@ IplImage *Image::cvImage(
 ) {
 	return this->_cvImage;
 }
+
+void Image::setCvImage(
+	IplImage *cvImage
+) {
+	this->_cvImage = cvImage;
+}
