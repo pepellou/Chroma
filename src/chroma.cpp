@@ -86,7 +86,7 @@ int Chroma::thisMethodShouldDie(
 
 		cvThreshold(mask->cvImage(), mask->cvImage(), 40, 255, CV_THRESH_BINARY);
 		cvNot(mask->cvImage(), mask->cvImage());
-		cvCopy(background->cvImage(), cop->cvImage(), mask->cvImage());
+		background->cloneTo(cop, mask);
 		mask->release();
 
 		wSalida->renderImage(cop);
