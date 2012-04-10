@@ -84,8 +84,8 @@ int Chroma::thisMethodShouldDie(
 
 		wDiferencia->renderImage(mask);
 
-		cvThreshold(mask->cvImage(), mask->cvImage(), 40, 255, CV_THRESH_BINARY);
-		cvNot(mask->cvImage(), mask->cvImage());
+		mask->binarize();
+		mask->negativize();
 		background->cloneTo(cop, mask);
 		mask->release();
 

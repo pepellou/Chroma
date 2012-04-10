@@ -149,3 +149,19 @@ Image *Image::mergeChannelsToMaximum() {
 
 	return maxAll;
 }
+
+void Image::binarize(
+) {
+	cvThreshold(
+		_cvImage, 
+		_cvImage, 
+		40, 
+		255, 
+		CV_THRESH_BINARY
+	);
+}
+
+void Image::negativize(
+) {
+	cvNot(_cvImage, _cvImage);
+}

@@ -34,6 +34,8 @@ class Image {
 		Image *differenceWith(Image *anotherImage);
 		Image *mergeToMaximumWith(Image *anotherImage);
 		Image *mergeChannelsToMaximum();
+		void binarize();
+		void negativize();
 
 	private:
 		IplImage *_cvImage;
