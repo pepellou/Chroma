@@ -49,37 +49,43 @@ int Chroma::thisMethodShouldDie(
 	Image *background = new Image("./tests/data/fondo.jpg");
 	background->resizeLike(staticScene);
 
-
-	while(1) {
+	while (true) {
 		Image *inputSignal = camera->grabCurrentFrame();
 
 		if (inputSignal->originPosition() == BOTTOM_LEFT)
 			inputSignal->flip();
 
-		wEntrada->renderImage(inputSignal);
 
 		if (camera->processedFrames() == 50) {
 			inputSignal->cloneTo(staticScene);
 		}
-		wModelo->renderImage(staticScene);
+
+
+		Image *outputSignal = inputSignal->clone();
 
 		Image *difference = staticScene->differenceWith(inputSignal);
 		Image *mask = difference->mergeChannelsToMaximum();
 
 		difference->release();
 
-		wDiferencia->renderImage(mask);
-
 		mask->binarize();
 		mask->negativize();
-		background->cloneTo(inputSignal, mask);
-		mask->release();
+		background->cloneTo(outputSignal, mask);
 
-		wSalida->renderImage(inputSignal);
+		wEntrada->renderImage(inputSignal);
+		wModelo->renderImage(staticScene);
+		wDiferencia->renderImage(mask);
+		wSalida->renderImage(outputSignal);
+
+		mask->release();
+		difference->release();
+		outputSignal->release();
 
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
+	staticScene->release();
+	background->release();
 	camera->release();
 	cvDestroyWindow( "KarapaKroma" );
 	return 0;
