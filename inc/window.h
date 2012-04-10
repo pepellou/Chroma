@@ -1,0 +1,20 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
+#include "image.h"
+
+class Window {
+
+	public:
+		Window(char *name, int x, int y);
+		void renderImage(Image *image);
+
+	private:
+		char *_name;
+
+};
+
+#endif

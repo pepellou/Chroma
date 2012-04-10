@@ -1,4 +1,5 @@
 #include "chroma.h"
+#include "window.h"
 
 using namespace std;
 
@@ -60,6 +61,11 @@ int Chroma::thisMethodShouldDie(
 	Image *difference = cop->clone();
 	Image *mask = cop->cloneJustDimensions(1);
 
+	Window *wEntrada = new Window((char *) "Entrada", 1, 1);
+	Window *wModelo = new Window((char *) "Modelo", 400, 1);
+	Window *wDiferencia = new Window((char *) "Diferencia", 800, 1);
+	Window *wSalida = new Window((char *) "Salida", 400, 350);
+
 	int numf= 0; 
 	while(1) {
 		camera->grabCurrentFrame();
@@ -68,27 +74,22 @@ int Chroma::thisMethodShouldDie(
 		if (currentFrame->originPosition() == BOTTOM_LEFT)
 			cop->flip();
 
-		cvNamedWindow("Entrada", 0);
-		cvMoveWindow("Entrada", 1, 1);
-		cvShowImage("Entrada", cop->cvImage());
+		wEntrada->renderImage(cop);
+
 		numf++;
 		if (numf==50) {
 			cvCopy(cop->cvImage(), modelo->cvImage());
 		}
-		cvNamedWindow("Modelo", 0);
-		cvMoveWindow("Modelo", 400, 1);
-		cvShowImage("Modelo", modelo->cvImage());
+		wModelo->renderImage(modelo);
+
 		cvAbsDiff(modelo->cvImage(), cop->cvImage(), difference->cvImage());
 		MaxCanales(difference, mask);
-		cvNamedWindow("Diferencia", 0);
-		cvMoveWindow("Diferencia", 800, 1);
-		cvShowImage("Diferencia", mask->cvImage());
+		wDiferencia->renderImage(mask);
+
 		cvThreshold(mask->cvImage(), mask->cvImage(), 40, 255, CV_THRESH_BINARY);
 		cvNot(mask->cvImage(), mask->cvImage());
 		cvCopy(background->cvImage(), cop->cvImage(), mask->cvImage());
-		cvNamedWindow("Salida", 0);
-		cvMoveWindow("Salida", 400, 350);
-		cvShowImage("Salida", cop->cvImage());
+		wSalida->renderImage(cop);
 
 
 		char c = cvWaitKey(33);
