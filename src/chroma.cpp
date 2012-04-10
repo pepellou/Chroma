@@ -37,32 +37,37 @@ Camera *Chroma::input(
 int Chroma::thisMethodShouldDie(
 ) {
 	Camera* camera = input();
-	Image *img = camera->grabCurrentFrame();
-	if (!img->cvImage()) { 
+	Image *currentFrame = camera->grabCurrentFrame();
+
+	if (!currentFrame->isValid()) { 
 		camera->release();
 		return -1;
 	} 
-	Image *cop = new Image(cvCloneImage(img->cvImage()));
-	cop->cvImage()->origin= 0; 
-	Image *modelo = new Image(cvCloneImage(cop->cvImage()));
-	if (img->cvImage()->origin) 
-		cvFlip(modelo->cvImage()); 
-	modelo->cvImage()->origin= 0; 
-	Image *tmp = new Image(cvCloneImage(cop->cvImage()));
-	Image *nuevofondo = new Image(cvLoadImage("./tests/data/fondo.jpg"));
-	cvResize(nuevofondo->cvImage(), tmp->cvImage()); 
-	nuevofondo->release();
-	nuevofondo -> setCvImage(tmp->cvImage());
-	Image *dif = new Image(cvCloneImage(cop->cvImage()));
-	Image *masc = new Image(cvCreateImage(cvGetSize(cop->cvImage()), cop->cvImage()->depth, 1));
+
+	Image *cop = currentFrame->clone();
+	cop->setOriginPosition(TOP_LEFT); 
+
+	Image *modelo = cop->clone();
+
+	if (currentFrame->originPosition() == BOTTOM_LEFT) 
+		modelo->flip();
+
+	modelo->setOriginPosition(TOP_LEFT); 
+
+	Image *background = new Image("./tests/data/fondo.jpg");
+	background->resizeLike(cop);
+
+	Image *difference = cop->clone();
+	Image *mask = cop->cloneJustDimensions(1);
+
 	int numf= 0; 
 	while(1) {
 		camera->grabCurrentFrame();
 
-		if (img->cvImage()->origin==0)
-			cvCopy(img->cvImage(), cop->cvImage());
-		else
-			cvFlip(img->cvImage(), cop->cvImage());
+		currentFrame->cloneTo(cop);
+		if (currentFrame->originPosition() == BOTTOM_LEFT)
+			cop->flip();
+
 		cvNamedWindow("Entrada", 0);
 		cvMoveWindow("Entrada", 1, 1);
 		cvShowImage("Entrada", cop->cvImage());
@@ -73,14 +78,14 @@ int Chroma::thisMethodShouldDie(
 		cvNamedWindow("Modelo", 0);
 		cvMoveWindow("Modelo", 400, 1);
 		cvShowImage("Modelo", modelo->cvImage());
-		cvAbsDiff(modelo->cvImage(), cop->cvImage(), dif->cvImage());
-		MaxCanales(dif, masc);
+		cvAbsDiff(modelo->cvImage(), cop->cvImage(), difference->cvImage());
+		MaxCanales(difference, mask);
 		cvNamedWindow("Diferencia", 0);
 		cvMoveWindow("Diferencia", 800, 1);
-		cvShowImage("Diferencia", masc->cvImage());
-		cvThreshold(masc->cvImage(), masc->cvImage(), 40, 255, CV_THRESH_BINARY);
-		cvNot(masc->cvImage(), masc->cvImage());
-		cvCopy(nuevofondo->cvImage(), cop->cvImage(), masc->cvImage());
+		cvShowImage("Diferencia", mask->cvImage());
+		cvThreshold(mask->cvImage(), mask->cvImage(), 40, 255, CV_THRESH_BINARY);
+		cvNot(mask->cvImage(), mask->cvImage());
+		cvCopy(background->cvImage(), cop->cvImage(), mask->cvImage());
 		cvNamedWindow("Salida", 0);
 		cvMoveWindow("Salida", 400, 350);
 		cvShowImage("Salida", cop->cvImage());

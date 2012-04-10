@@ -30,12 +30,11 @@ void Camera::release(
 
 Image *Camera::grabCurrentFrame(
 ) {
+	IplImage *currentCvFrame = cvQueryFrame(_cvCapture);
 	if (this->_currentFrame == NULL) {
 		this->_currentFrame = new Image(
-			cvQueryFrame(_cvCapture)
+			currentCvFrame
 		);
-	} else {
-		cvQueryFrame(_cvCapture);
 	}
 	return this->_currentFrame;
 }
