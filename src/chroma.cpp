@@ -86,7 +86,7 @@ int Chroma::thisMethodShouldDie(
 		cvCopy(nuevofondo->cvImage(), cop->cvImage(), masc->cvImage());
 		cvNamedWindow("Salida", 0);
 		cvMoveWindow("Salida", 400, 350);
-		cvShowImage("Salida", duplicate(cop)->cvImage());
+		cvShowImage("Salida", cop->duplicate()->cvImage());
 
 
 		char c = cvWaitKey(33);
@@ -96,18 +96,6 @@ int Chroma::thisMethodShouldDie(
 	cvDestroyWindow( "KarapaKroma" );
 	return 0;
 }
-
-Image* Chroma::duplicate(
-	Image *in
-) {
-	Image* out = new Image(cvCreateImage(
-		cvSize(2*in->cvImage()->width, 2*in->cvImage()->height),
-		IPL_DEPTH_8U,
-		in->cvImage()->nChannels
-	));
-	cvPyrUp(in->cvImage(), out->cvImage());
-	return out;
-};
 
 void Chroma::putStarPeak(
 	Image *frame,

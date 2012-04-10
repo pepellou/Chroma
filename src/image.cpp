@@ -23,14 +23,25 @@ void Image::release(
 }
 
 Image *Image::smooth(
-	Image *in
 ) {
 	Image *out = new Image(cvCreateImage(
-		cvGetSize(in),
+		cvGetSize(_cvImage),
 		IPL_DEPTH_8U,
 		3
 	));
-	cvSmooth( in->cvImage(), out->cvImage(), CV_GAUSSIAN, 3, 3 );
+	cvSmooth( _cvImage, out->cvImage(), CV_GAUSSIAN, 3, 3 );
 
 	return out;
 }
+
+Image* Image::duplicate(
+) {
+	Image* out = new Image(cvCreateImage(
+		cvSize(2*_cvImage->width, 2*_cvImage->height),
+		IPL_DEPTH_8U,
+		_cvImage->nChannels
+	));
+	cvPyrUp(_cvImage, out->cvImage());
+	return out;
+}
+
