@@ -45,3 +45,11 @@ Image* Image::duplicate(
 	return out;
 }
 
+void Image::fillColor(
+	CvPoint startPoint,
+	CvScalar color,
+	CvScalar threshold
+) {
+	cvFloodFill(_cvImage, startPoint, color, threshold, threshold);
+}
+

@@ -13,6 +13,11 @@ class Image {
 		void release();
 		Image *smooth();
 		Image *duplicate();
+		void fillColor(
+			CvPoint startPoint,
+			CvScalar color,
+			CvScalar threshold
+		);
 
 	private:
 		IplImage *_cvImage;

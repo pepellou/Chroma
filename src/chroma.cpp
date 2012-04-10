@@ -131,15 +131,6 @@ void Chroma::putStar(
 	cvPutText(frame->cvImage(), "Kroma", cvPoint(175,320), font, red);
 }
 
-void Chroma::fill_croma_from_border(
-	Image *frame,
-	CvPoint border_point,
-	CvScalar color,
-	CvScalar threshold
-) {
-	cvFloodFill(frame->cvImage(), border_point, color, threshold, threshold);
-}
-
 void Chroma::invert(
 	Image *src,
 	Image *dst
