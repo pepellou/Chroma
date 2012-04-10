@@ -176,35 +176,34 @@ Image *Image::cleanIsolatedDots(
 	int height = _cvImage->height;
 	int channels = _cvImage->nChannels;
 	int step = _cvImage->widthStep;
+
+	int around_points[][2] = { {-1, -1}, {1, -1}, {1, 1},   {-1, 1} };
+	int total_around = sizeof(around_points) / sizeof(int);
+	int point;
+	float maximum_not_same = 0.1 * total_around;
+
 	for (y = 0; y < height; y++) {
 		for (x = 0; x < width; x++) {
 			for (c = 0; c < channels; c++) {
 				int index = y * step
 					+ x * channels + c;
 				int new_color = dataIn[index];
+				dataOut[index] = new_color;
 
-				int around_points[][2] = {
-					{-1, 0}, {-1, -1}, {0, -1}, {1, -1},
-					{1, 0},  {1, 1},   {0, 1},  {-1, 1}
-				};
-				int same_around = 0, count_around = 0;
-				int total_around = sizeof(around_points) / sizeof(int);
-				int point;
-				for (point = 0; point < total_around; point++) {
-					int nx = x + around_points[point][0];
-					int ny = y + around_points[point][1];
-					if (nx < width && nx >= 0 && ny < height && ny >= 0) {
-						count_around++;
-						int new_index = ny * step + nx * channels + c;
-						if (dataIn[new_index] == new_color)
-							same_around++;
+				if (x < width - 1 && x > 0 && y < height - 1 && y > 0) {
+					int not_same_around = 0;
+					for (point = 0; not_same_around < maximum_not_same && point < total_around; point++) {
+						int nx = x + around_points[point][0];
+						int ny = y + around_points[point][1];
+						if (nx < width && nx >= 0 && ny < height && ny >= 0) {
+							int new_index = ny * step + nx * channels + c;
+							if (dataIn[new_index] != new_color)
+								not_same_around++;
+						}
 					}
+					if (not_same_around == maximum_not_same)
+						dataOut[index] = 255 - new_color;
 				}
-
-				if (same_around * 1.0 / count_around > 0.5)
-					dataOut[index] = new_color;
-				else
-					dataOut[index] = 255 - new_color;
 			}
 		}
 	}
