@@ -77,8 +77,8 @@ int Chroma::thisMethodShouldDie(
 		wEntrada->renderImage(cop);
 
 		numf++;
-		if (numf==50) {
-			cvCopy(cop->cvImage(), modelo->cvImage());
+		if (numf == 50) {
+			cop->cloneTo(modelo);
 		}
 		wModelo->renderImage(modelo);
 
@@ -90,7 +90,6 @@ int Chroma::thisMethodShouldDie(
 		cvNot(mask->cvImage(), mask->cvImage());
 		cvCopy(background->cvImage(), cop->cvImage(), mask->cvImage());
 		wSalida->renderImage(cop);
-
 
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
