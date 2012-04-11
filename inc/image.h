@@ -38,7 +38,7 @@ class Image {
 		void mergeToMaximumWithAndStore(Image *anotherImage, Image *store);
 		void mergeChannelsToMaximumAndStore(Image *store);
 
-		void binarize();
+		void binarize(int threshold = 40);
 		void negativize();
 		Image *cleanIsolatedDots();
 		Image *duplicate();

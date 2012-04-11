@@ -5,6 +5,8 @@ using namespace std;
 
 Chroma::Chroma(
 ) {
+	this->binarize_threshold = 40;
+
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
 
@@ -31,6 +33,19 @@ Chroma::Chroma(
 	this->difference = NULL;
 	this->cleanDifference = NULL;
 }
+
+void Chroma::incrementBinarizationThreshold(
+) {
+	if (this->binarize_threshold < 255)
+		this->binarize_threshold++;
+}
+
+void Chroma::decrementBinarizationThreshold(
+) {
+	if (this->binarize_threshold > 0)
+		this->binarize_threshold--;
+}
+
 
 void Chroma::release(
 ) {
@@ -83,7 +98,7 @@ void Chroma::computeDifference(
 	this->difference->mergeChannelsToMaximumAndStore(
 		this->cleanDifference
 	);
-	this->cleanDifference->binarize();
+	this->cleanDifference->binarize(this->binarize_threshold);
 	this->cleanDifference->negativize();
 	//this->cleanDifference->cleanIsolatedDots();
 }
@@ -115,6 +130,14 @@ bool Chroma::processKeys(
 		case 65:
 		case 97:
 			this->grabStaticScene();
+			break;
+		case 88:
+		case 120:
+			this->incrementBinarizationThreshold();
+			break;
+		case 90:
+		case 122:
+			this->decrementBinarizationThreshold();
 			break;
 	}
 

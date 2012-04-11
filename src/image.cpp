@@ -186,11 +186,12 @@ void Image::mergeChannelsToMaximumAndStore(
 }
 
 void Image::binarize(
+	int threshold
 ) {
 	cvThreshold(
 		_cvImage, 
 		_cvImage, 
-		40, 
+		 threshold, 
 		255, 
 		CV_THRESH_BINARY
 	);

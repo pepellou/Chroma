@@ -32,6 +32,9 @@ class Chroma {
 		void renderWindows();
 		bool processKeys();
 
+		void incrementBinarizationThreshold();
+		void decrementBinarizationThreshold();
+
 	private:
 		std::string _name;
 		Camera *_input;
@@ -46,6 +49,8 @@ class Chroma {
 		Image *outputSignal;
 		Image *difference;
 		Image *cleanDifference;
+
+		int binarize_threshold;
 
 };
 
