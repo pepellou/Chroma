@@ -32,8 +32,12 @@ class Chroma {
 		void renderWindows();
 		bool processKeys();
 
-		void incrementBinarizationThreshold();
-		void decrementBinarizationThreshold();
+		void increaseBinarizationThreshold();
+		void decreaseBinarizationThreshold();
+		void increaseCropWidth();
+		void decreaseCropWidth();
+		void increaseCropHeight();
+		void decreaseCropHeight();
 
 	private:
 		std::string _name;
@@ -49,10 +53,15 @@ class Chroma {
 		Image *outputSignal;
 		Image *difference;
 		Image *cleanDifference;
+		int crop_width;
+		int crop_height;
+		int maxCropHeight;
+		int maxCropWidth;
 
 		int binarize_threshold;
 		void outputBinarizationThreshold();
 		void outputHelp();
+		void outputCropDimensions();
 
 };
 

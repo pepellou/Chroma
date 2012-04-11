@@ -17,8 +17,8 @@ Chroma::Chroma(
 	this->wDifference = new Window((char *) "Diferencia", 800, 1);
 	this->wCleanDifference = new Window(
 		(char *) "Diferencia limpia", 
-		1200, 
-		1
+		1, 
+		350
 	);
 	this->wOutput = new Window(
 		(char *) "Salida", 
@@ -30,24 +30,65 @@ Chroma::Chroma(
 	grabStaticScene();
 	this->background = new Image("./tests/data/fondo.jpg");
 	this->background->resizeLike(this->staticScene);
+	this->maxCropWidth = this->background->cvImage()->width;
+	this->maxCropHeight = this->background->cvImage()->height;
+	this->crop_width = this->maxCropWidth;
+	this->crop_height = this->maxCropHeight;
 	this->inputSignal = NULL;
 	this->outputSignal = NULL;
 	this->difference = NULL;
 	this->cleanDifference = NULL;
 }
 
-void Chroma::incrementBinarizationThreshold(
+void Chroma::increaseBinarizationThreshold(
 ) {
 	if (this->binarize_threshold < 255)
 		this->binarize_threshold++;
 	this->outputBinarizationThreshold();
 }
 
-void Chroma::decrementBinarizationThreshold(
+void Chroma::decreaseBinarizationThreshold(
 ) {
 	if (this->binarize_threshold > 0)
 		this->binarize_threshold--;
 	this->outputBinarizationThreshold();
+}
+
+void Chroma::increaseCropWidth(
+) {
+	if (this->crop_width < this->maxCropWidth)
+		this->crop_width++;
+	this->outputCropDimensions();
+}
+
+void Chroma::decreaseCropWidth(
+) {
+	if (this->crop_width > 0)
+		this->crop_width--;
+	this->outputCropDimensions();
+}
+
+void Chroma::increaseCropHeight(
+) {
+	if (this->crop_height < this->maxCropHeight)
+		this->crop_height++;
+	this->outputCropDimensions();
+}
+
+void Chroma::decreaseCropHeight(
+) {
+	if (this->crop_height > 0)
+		this->crop_height--;
+	this->outputCropDimensions();
+}
+
+void Chroma::outputCropDimensions(
+) {
+	cout 
+		<< "Crop dimensions = " 
+		<< this->crop_width << " x " << this->crop_height
+		<< endl;
+	flush(cout);
 }
 
 void Chroma::outputBinarizationThreshold(
@@ -63,11 +104,16 @@ void Chroma::outputHelp(
 ) {
 	cout 
 		<< "COMMANDS " << endl
-		<< "     S: Grab static scene" << endl 
-		<< "     X: Increment binarization threshold" << endl 
-		<< "     Z: Decrement binarization threshold" << endl 
-		<< "     H: This help" << endl << endl
-		<< " <ESC>: Exit program" << endl 
+		<< "           E: Decrease crop height" << endl 
+		<< "           H: This help" << endl
+		<< "           Q: Decrease crop width" << endl 
+		<< "           R: Increase crop height" << endl 
+		<< "           S: Grab static scene" << endl 
+		<< "           W: Increase crop width" << endl 
+		<< "           X: Increase binarization threshold" << endl 
+		<< "           Z: Decrease binarization threshold" << endl 
+		<< endl << "   <CURSORS>: Move crop" << endl
+		<< endl << "       <ESC>: Exit program" << endl 
 	;
 	flush(cout);
 }
@@ -150,24 +196,40 @@ bool Chroma::processKeys(
 	char key = cvWaitKey(33);
 
 	switch (key) {
-		case 27: 
-			return false;
-		case 's':
-		case 'S':
-			this->grabStaticScene();
-			break;
-		case 'x':
-		case 'X':
-			this->incrementBinarizationThreshold();
-			break;
-		case 'z':
-		case 'Z':
-			this->decrementBinarizationThreshold();
+		case 'e':
+		case 'E':
+			this->decreaseCropHeight();
 			break;
 		case 'h':
 		case 'H':
 			this->outputHelp();
 			break;
+		case 'q':
+		case 'Q':
+			this->decreaseCropWidth();
+			break;
+		case 'r':
+		case 'R':
+			this->increaseCropHeight();
+			break;
+		case 's':
+		case 'S':
+			this->grabStaticScene();
+			break;
+		case 'w':
+		case 'W':
+			this->increaseCropWidth();
+			break;
+		case 'x':
+		case 'X':
+			this->increaseBinarizationThreshold();
+			break;
+		case 'z':
+		case 'Z':
+			this->decreaseBinarizationThreshold();
+			break;
+		case 80: return false;
+		case 27: return false;
 	}
 
 	return true;
