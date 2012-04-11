@@ -38,6 +38,7 @@ class Chroma {
 		void decreaseCropWidth();
 		void increaseCropHeight();
 		void decreaseCropHeight();
+		void resetCropDimensions();
 
 	private:
 		std::string _name;

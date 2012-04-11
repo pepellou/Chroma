@@ -32,8 +32,7 @@ Chroma::Chroma(
 	this->background->resizeLike(this->staticScene);
 	this->maxCropWidth = this->background->cvImage()->width;
 	this->maxCropHeight = this->background->cvImage()->height;
-	this->crop_width = this->maxCropWidth;
-	this->crop_height = this->maxCropHeight;
+	this->resetCropDimensions();
 	this->inputSignal = NULL;
 	this->outputSignal = NULL;
 	this->difference = NULL;
@@ -82,6 +81,13 @@ void Chroma::decreaseCropHeight(
 	this->outputCropDimensions();
 }
 
+void Chroma::resetCropDimensions(
+) {
+	this->crop_width = this->maxCropWidth;
+	this->crop_height = this->maxCropHeight;
+	this->outputCropDimensions();
+}
+
 void Chroma::outputCropDimensions(
 ) {
 	cout 
@@ -104,14 +110,15 @@ void Chroma::outputHelp(
 ) {
 	cout 
 		<< "COMMANDS " << endl
-		<< "           E: Decrease crop height" << endl 
-		<< "           H: This help" << endl
-		<< "           Q: Decrease crop width" << endl 
-		<< "           R: Increase crop height" << endl 
-		<< "           S: Grab static scene" << endl 
-		<< "           W: Increase crop width" << endl 
-		<< "           X: Increase binarization threshold" << endl 
-		<< "           Z: Decrease binarization threshold" << endl 
+		<< "           <: Decrease crop width" << endl 
+		<< "           >: Increase crop width" << endl 
+		<< "           =: Set default crop dimensions" << endl 
+		<< "           -: Decrease crop height" << endl 
+		<< "           +: Increase crop height" << endl 
+		<< "           ?: This help" << endl
+		<< "           G: Grab static scene" << endl 
+		<< "     <RePag>: Increase binarization threshold" << endl 
+		<< "     <AvPag>: Decrease binarization threshold" << endl 
 		<< endl << "   <CURSORS>: Move crop" << endl
 		<< endl << "       <ESC>: Exit program" << endl 
 	;
@@ -196,39 +203,34 @@ bool Chroma::processKeys(
 	char key = cvWaitKey(33);
 
 	switch (key) {
-		case 'e':
-		case 'E':
+		case 45:
 			this->decreaseCropHeight();
 			break;
-		case 'h':
-		case 'H':
+		case '?':
 			this->outputHelp();
 			break;
-		case 'q':
-		case 'Q':
+		case 60:
 			this->decreaseCropWidth();
 			break;
-		case 'r':
-		case 'R':
+		case 43:
 			this->increaseCropHeight();
 			break;
-		case 's':
-		case 'S':
+		case 'g':
+		case 'G':
 			this->grabStaticScene();
 			break;
-		case 'w':
-		case 'W':
+		case 62:
 			this->increaseCropWidth();
 			break;
-		case 'x':
-		case 'X':
+		case 61:
+			this->resetCropDimensions();
+			break;
+		case 'U':
 			this->increaseBinarizationThreshold();
 			break;
-		case 'z':
-		case 'Z':
+		case 'V':
 			this->decreaseBinarizationThreshold();
 			break;
-		case 80: return false;
 		case 27: return false;
 	}
 
