@@ -28,6 +28,9 @@ class Chroma {
 		void copyInputToOutput();
 		void grabInputSignal();
 		void computeDifference();
+		void applyBackgroundToOutput();
+		void renderWindows();
+		bool processKeys();
 
 	private:
 		std::string _name;

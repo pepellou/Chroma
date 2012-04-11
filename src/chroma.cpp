@@ -42,8 +42,12 @@ void Chroma::release(
 	this->_input->release();
 	this->staticScene->release();
 	this->background->release();
-	this->outputSignal->release();
-	this->difference->release();
+	if (this->outputSignal != NULL)
+		this->outputSignal->release();
+	if (this->difference != NULL)
+		this->difference->release();
+	if (this->cleanDifference != NULL)
+		this->cleanDifference->release();
 }
 
 void Chroma::grabStaticScene(
@@ -84,6 +88,31 @@ void Chroma::computeDifference(
 	//this->cleanDifference->cleanIsolatedDots();
 }
 
+void Chroma::applyBackgroundToOutput(
+) {
+	this->background->cloneTo(
+		this->outputSignal, 
+		this->cleanDifference
+	);
+}
+
+void Chroma::renderWindows(
+) {
+	this->wInput->renderImage(this->inputSignal);
+	this->wModel->renderImage(this->staticScene);
+	this->wDifference->renderImage(this->difference);
+	this->wCleanDifference->renderImage(this->cleanDifference);
+	this->wOutput->renderImage(this->outputSignal);
+}
+
+bool Chroma::processKeys(
+) {
+	char c = cvWaitKey(33);
+	if( c == 27 ) return false;
+
+	return true;
+}
+
 void Chroma::grabInputSignal(
 ) {
 	Camera* camera = input();
@@ -116,7 +145,9 @@ Camera *Chroma::input(
 
 int Chroma::mainLoop(
 ) {
-	while (true) {
+	bool running = true;
+
+	while (running) {
 
 		this->grabInputSignal();
 
@@ -124,19 +155,12 @@ int Chroma::mainLoop(
 
 		this->computeDifference();
 
-		this->background->cloneTo(
-			this->outputSignal, 
-			this->cleanDifference
-		);
+		this->applyBackgroundToOutput();
 
-		this->wInput->renderImage(this->inputSignal);
-		this->wModel->renderImage(this->staticScene);
-		this->wDifference->renderImage(this->difference);
-		this->wCleanDifference->renderImage(this->cleanDifference);
-		this->wOutput->renderImage(this->outputSignal);
+		this->renderWindows();
 
-		char c = cvWaitKey(33);
-		if( c == 27 ) break;
+		running = this->processKeys();
+
 	}
 	this->release();
 	return 0;
