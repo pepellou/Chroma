@@ -39,6 +39,10 @@ class Chroma {
 		void increaseCropHeight();
 		void decreaseCropHeight();
 		void resetCropDimensions();
+		void moveCropLeft();
+		void moveCropRight();
+		void moveCropUp();
+		void moveCropDown();
 
 	private:
 		std::string _name;
@@ -58,11 +62,14 @@ class Chroma {
 		int crop_height;
 		int maxCropHeight;
 		int maxCropWidth;
+		int crop_x;
+		int crop_y;
 
 		int binarize_threshold;
 		void outputBinarizationThreshold();
 		void outputHelp();
 		void outputCropDimensions();
+		void adjustCropPosition();
 
 };
 

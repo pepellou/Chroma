@@ -57,6 +57,7 @@ void Chroma::increaseCropWidth(
 ) {
 	if (this->crop_width < this->maxCropWidth)
 		this->crop_width++;
+	this->adjustCropPosition();
 	this->outputCropDimensions();
 }
 
@@ -64,6 +65,7 @@ void Chroma::decreaseCropWidth(
 ) {
 	if (this->crop_width > 0)
 		this->crop_width--;
+	this->adjustCropPosition();
 	this->outputCropDimensions();
 }
 
@@ -71,6 +73,7 @@ void Chroma::increaseCropHeight(
 ) {
 	if (this->crop_height < this->maxCropHeight)
 		this->crop_height++;
+	this->adjustCropPosition();
 	this->outputCropDimensions();
 }
 
@@ -78,13 +81,56 @@ void Chroma::decreaseCropHeight(
 ) {
 	if (this->crop_height > 0)
 		this->crop_height--;
+	this->adjustCropPosition();
 	this->outputCropDimensions();
+}
+
+void Chroma::moveCropLeft(
+) {
+	this->crop_x--;
+	this->adjustCropPosition();
+	this->outputCropDimensions();
+}
+
+void Chroma::moveCropRight(
+) {
+	this->crop_x++;
+	this->adjustCropPosition();
+	this->outputCropDimensions();
+}
+
+void Chroma::moveCropUp(
+) {
+	this->crop_y--;
+	this->adjustCropPosition();
+	this->outputCropDimensions();
+}
+
+void Chroma::moveCropDown(
+) {
+	this->crop_y++;
+	this->adjustCropPosition();
+	this->outputCropDimensions();
+}
+
+void Chroma::adjustCropPosition(
+) {
+	if (this->crop_x < 0)
+		this->crop_x = 0;
+	if (this->crop_y < 0)
+		this->crop_y = 0;
+	if (this->crop_x > this->maxCropWidth - this->crop_width)
+		this->crop_x = this->maxCropWidth - this->crop_width;
+	if (this->crop_y > this->maxCropHeight - this->crop_height)
+		this->crop_y = this->maxCropHeight - this->crop_height;
 }
 
 void Chroma::resetCropDimensions(
 ) {
 	this->crop_width = this->maxCropWidth;
 	this->crop_height = this->maxCropHeight;
+	this->crop_x = 0;
+	this->crop_y = 0;
 	this->outputCropDimensions();
 }
 
@@ -93,6 +139,7 @@ void Chroma::outputCropDimensions(
 	cout 
 		<< "Crop dimensions = " 
 		<< this->crop_width << " x " << this->crop_height
+		<< " placed at (" << this->crop_x << ", " << this->crop_y << ")"
 		<< endl;
 	flush(cout);
 }
@@ -230,6 +277,18 @@ bool Chroma::processKeys(
 			break;
 		case 'V':
 			this->decreaseBinarizationThreshold();
+			break;
+		case 'Q':
+			this->moveCropLeft();
+			break;
+		case 'R':
+			this->moveCropUp();
+			break;
+		case 'T':
+			this->moveCropDown();
+			break;
+		case 'S':
+			this->moveCropRight();
 			break;
 		case 27: return false;
 	}
