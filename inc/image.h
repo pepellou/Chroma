@@ -31,9 +31,13 @@ class Image {
 		void resizeLike(Image *otherImage);
 		int originPosition();
 		void setOriginPosition(int position);
+		void storeDifferenceWith(Image *anotherImage, Image *toStore);
 		Image *differenceWith(Image *anotherImage);
 		Image *mergeToMaximumWith(Image *anotherImage);
 		Image *mergeChannelsToMaximum();
+		void mergeToMaximumWithAndStore(Image *anotherImage, Image *store);
+		void mergeChannelsToMaximumAndStore(Image *store);
+
 		void binarize();
 		void negativize();
 		Image *cleanIsolatedDots();

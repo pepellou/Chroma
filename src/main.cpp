@@ -2,5 +2,5 @@
 
 int main( int argc, char** argv ) {
 	Chroma chroma;
-	return chroma.thisMethodShouldDie();
+	return chroma.mainLoop();
 }

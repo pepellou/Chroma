@@ -110,6 +110,17 @@ Image *Image::differenceWith(
 	return difference;
 }
 
+void Image::storeDifferenceWith(
+	Image *anotherImage,
+	Image *toStore
+) {
+	cvAbsDiff(
+		_cvImage, 
+		anotherImage->_cvImage, 
+		toStore->_cvImage
+	);
+}
+
 void Image::splitTo(
 	Image *channel1,
 	Image *channel2,
@@ -122,6 +133,13 @@ void Image::splitTo(
 		channel3->_cvImage, 
 		NULL
 	);
+}
+
+void Image::mergeToMaximumWithAndStore(
+	Image *anotherImage,
+	Image *toStore
+) {
+	cvMax(_cvImage, anotherImage->_cvImage, toStore->_cvImage);
 }
 
 Image *Image::mergeToMaximumWith(
@@ -148,6 +166,23 @@ Image *Image::mergeChannelsToMaximum() {
 	channel3->release();
 
 	return maxAll;
+}
+
+void Image::mergeChannelsToMaximumAndStore(
+	Image *toStore
+) {
+	Image *channel1 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel2 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel3 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+
+	this->splitTo(channel1, channel2, channel3);
+
+	channel1->mergeToMaximumWithAndStore(channel2, toStore);
+	toStore->mergeToMaximumWithAndStore(channel3, toStore);
+
+	channel1->release();
+	channel2->release();
+	channel3->release();
 }
 
 void Image::binarize(

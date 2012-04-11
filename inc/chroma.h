@@ -20,22 +20,29 @@ class Chroma {
 		void setName(std::string name);
 		void setInput(Camera *input);
 
-		int thisMethodShouldDie();
+		int mainLoop();
 
 		void release();
 
 		void grabStaticScene();
+		void copyInputToOutput();
+		void grabInputSignal();
+		void computeDifference();
 
 	private:
 		std::string _name;
 		Camera *_input;
 		Window *wInput;
 		Window *wModel;
-		Window *wMask;
-		Window *wCleanMask;
+		Window *wDifference;
+		Window *wCleanDifference;
 		Window *wOutput;
 		Image *staticScene;
 		Image *background;
+		Image *inputSignal;
+		Image *outputSignal;
+		Image *difference;
+		Image *cleanDifference;
 
 };
 

@@ -10,8 +10,8 @@ Chroma::Chroma(
 
 	this->wInput = new Window((char *) "Entrada", 1, 1);
 	this->wModel = new Window((char *) "Modelo", 400, 1);
-	this->wMask = new Window((char *) "Diferencia", 800, 1);
-	this->wCleanMask = new Window(
+	this->wDifference = new Window((char *) "Diferencia", 800, 1);
+	this->wCleanDifference = new Window(
 		(char *) "Diferencia limpia", 
 		1200, 
 		1
@@ -26,24 +26,70 @@ Chroma::Chroma(
 	grabStaticScene();
 	this->background = new Image("./tests/data/fondo.jpg");
 	this->background->resizeLike(this->staticScene);
+	this->inputSignal = NULL;
+	this->outputSignal = NULL;
+	this->difference = NULL;
+	this->cleanDifference = NULL;
 }
 
 void Chroma::release(
 ) {
 	this->wInput->release();
 	this->wModel->release();
-	this->wMask->release();
-	this->wCleanMask->release();
+	this->wDifference->release();
+	this->wCleanDifference->release();
 	this->wOutput->release();
 	this->_input->release();
 	this->staticScene->release();
 	this->background->release();
+	this->outputSignal->release();
+	this->difference->release();
 }
 
 void Chroma::grabStaticScene(
 ) {
 	Camera* camera = input();
 	this->staticScene = camera->grabStaticScene();
+}
+
+void Chroma::copyInputToOutput(
+) {
+	if (this->outputSignal != NULL)
+		this->inputSignal->cloneTo(this->outputSignal);
+	else
+		this->outputSignal = this->inputSignal->clone();
+}
+
+void Chroma::computeDifference(
+) {
+	if (this->difference != NULL) {
+		this->staticScene->storeDifferenceWith(
+			this->inputSignal, 
+			this->difference
+		);
+	} else {
+		this->difference = 
+			this->staticScene->differenceWith(
+				this->inputSignal
+			);
+		this->cleanDifference = 
+			this->difference->cloneJustDimensions(1);
+	}
+
+	this->difference->mergeChannelsToMaximumAndStore(
+		this->cleanDifference
+	);
+	this->cleanDifference->binarize();
+	this->cleanDifference->negativize();
+	//this->cleanDifference->cleanIsolatedDots();
+}
+
+void Chroma::grabInputSignal(
+) {
+	Camera* camera = input();
+	this->inputSignal = camera->grabCurrentFrame();
+	if (this->inputSignal->originPosition() == BOTTOM_LEFT)
+		this->inputSignal->flip();
 }
 
 void Chroma::setName(
@@ -68,50 +114,26 @@ Camera *Chroma::input(
 	return this->_input;
 }
 
-// --- UNTESTED CODE FROM THIS POINT DOWN ------------
-
-
-
-// --- LITTER FROM THIS POINT DOWN -------------------
-
-int Chroma::thisMethodShouldDie(
+int Chroma::mainLoop(
 ) {
-	Camera* camera = input();
-
 	while (true) {
-		Image *inputSignal = camera->grabCurrentFrame();
 
-		if (inputSignal->originPosition() == BOTTOM_LEFT)
-			inputSignal->flip();
+		this->grabInputSignal();
 
+		this->copyInputToOutput();
 
-		if (camera->processedFrames() == 50) {
-			inputSignal->cloneTo(this->staticScene);
-		}
+		this->computeDifference();
 
+		this->background->cloneTo(
+			this->outputSignal, 
+			this->cleanDifference
+		);
 
-		Image *outputSignal = inputSignal->clone();
-
-		Image *difference = this->staticScene->differenceWith(inputSignal);
-		Image *mask = difference->mergeChannelsToMaximum();
-
-		mask->binarize();
-		mask->negativize();
-
-		Image *cleanMask = mask->cleanIsolatedDots();
-
-		this->background->cloneTo(outputSignal, cleanMask);
-
-		this->wInput->renderImage(inputSignal);
+		this->wInput->renderImage(this->inputSignal);
 		this->wModel->renderImage(this->staticScene);
-		this->wMask->renderImage(mask);
-		this->wCleanMask->renderImage(cleanMask);
-		this->wOutput->renderImage(outputSignal);
-
-		mask->release();
-		cleanMask->release();
-		difference->release();
-		outputSignal->release();
+		this->wDifference->renderImage(this->difference);
+		this->wCleanDifference->renderImage(this->cleanDifference);
+		this->wOutput->renderImage(this->outputSignal);
 
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
