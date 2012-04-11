@@ -3,9 +3,10 @@
 Window::Window(
 	char *name,
 	int x,
-	int y
+	int y,
+	int flags
 ) {
-	cvNamedWindow(name, CV_WINDOW_AUTOSIZE);
+	cvNamedWindow(name, flags);
 	cvMoveWindow(name, x, y);
 	this->_name = name;
 }

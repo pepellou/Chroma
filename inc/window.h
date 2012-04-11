@@ -9,7 +9,7 @@
 class Window {
 
 	public:
-		Window(char *name, int x, int y);
+		Window(char *name, int x, int y, int flags = 0);
 		void renderImage(Image *image);
 
 	private:
