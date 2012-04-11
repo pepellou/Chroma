@@ -11,6 +11,7 @@ class Window {
 	public:
 		Window(char *name, int x, int y, int flags = 0);
 		void renderImage(Image *image);
+		void release();
 
 	private:
 		char *_name;

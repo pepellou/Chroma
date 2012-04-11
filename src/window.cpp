@@ -16,3 +16,8 @@ void Window::renderImage(
 ) {
 	cvShowImage(this->_name, image->cvImage());
 }
+
+void Window::release(
+) {
+	cvDestroyWindow(this->_name);
+}

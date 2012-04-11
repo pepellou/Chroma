@@ -7,6 +7,43 @@ Chroma::Chroma(
 ) {
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
+
+	this->wInput = new Window((char *) "Entrada", 1, 1);
+	this->wModel = new Window((char *) "Modelo", 400, 1);
+	this->wMask = new Window((char *) "Diferencia", 800, 1);
+	this->wCleanMask = new Window(
+		(char *) "Diferencia limpia", 
+		1200, 
+		1
+	);
+	this->wOutput = new Window(
+		(char *) "Salida", 
+		400, 
+		350, 
+		CV_WINDOW_AUTOSIZE
+	);
+
+	grabStaticScene();
+	this->background = new Image("./tests/data/fondo.jpg");
+	this->background->resizeLike(this->staticScene);
+}
+
+void Chroma::release(
+) {
+	this->wInput->release();
+	this->wModel->release();
+	this->wMask->release();
+	this->wCleanMask->release();
+	this->wOutput->release();
+	this->_input->release();
+	this->staticScene->release();
+	this->background->release();
+}
+
+void Chroma::grabStaticScene(
+) {
+	Camera* camera = input();
+	this->staticScene = camera->grabStaticScene();
 }
 
 void Chroma::setName(
@@ -33,22 +70,13 @@ Camera *Chroma::input(
 
 // --- UNTESTED CODE FROM THIS POINT DOWN ------------
 
+
+
 // --- LITTER FROM THIS POINT DOWN -------------------
 
 int Chroma::thisMethodShouldDie(
 ) {
-	Window *wInput     = new Window((char *) "Entrada",              1,   1);
-	Window *wModel     = new Window((char *) "Modelo",             400,   1);
-	Window *wMask      = new Window((char *) "Diferencia",         800,   1);
-	Window *wCleanMask = new Window((char *) "Diferencia limpia", 1200,   1);
-	Window *wOutput    = new Window((char *) "Salida",             400, 350, CV_WINDOW_AUTOSIZE);
-
 	Camera* camera = input();
-
-	Image *staticScene = camera->grabStaticScene();
-
-	Image *background = new Image("./tests/data/fondo.jpg");
-	background->resizeLike(staticScene);
 
 	while (true) {
 		Image *inputSignal = camera->grabCurrentFrame();
@@ -58,13 +86,13 @@ int Chroma::thisMethodShouldDie(
 
 
 		if (camera->processedFrames() == 50) {
-			inputSignal->cloneTo(staticScene);
+			inputSignal->cloneTo(this->staticScene);
 		}
 
 
 		Image *outputSignal = inputSignal->clone();
 
-		Image *difference = staticScene->differenceWith(inputSignal);
+		Image *difference = this->staticScene->differenceWith(inputSignal);
 		Image *mask = difference->mergeChannelsToMaximum();
 
 		mask->binarize();
@@ -72,14 +100,13 @@ int Chroma::thisMethodShouldDie(
 
 		Image *cleanMask = mask->cleanIsolatedDots();
 
-		background->cloneTo(outputSignal, cleanMask);
+		this->background->cloneTo(outputSignal, cleanMask);
 
-		wInput->renderImage(inputSignal);
-		wModel->renderImage(staticScene);
-		wMask->renderImage(mask);
-		wCleanMask->renderImage(cleanMask);
-
-		wOutput->renderImage(outputSignal);
+		this->wInput->renderImage(inputSignal);
+		this->wModel->renderImage(this->staticScene);
+		this->wMask->renderImage(mask);
+		this->wCleanMask->renderImage(cleanMask);
+		this->wOutput->renderImage(outputSignal);
 
 		mask->release();
 		cleanMask->release();
@@ -89,9 +116,6 @@ int Chroma::thisMethodShouldDie(
 		char c = cvWaitKey(33);
 		if( c == 27 ) break;
 	}
-	staticScene->release();
-	background->release();
-	camera->release();
-	cvDestroyWindow( "KarapaKroma" );
+	this->release();
 	return 0;
 }

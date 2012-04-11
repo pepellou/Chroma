@@ -7,6 +7,7 @@
 
 #include "camera.h"
 #include "image.h"
+#include "window.h"
 
 class Chroma {
 
@@ -21,9 +22,20 @@ class Chroma {
 
 		int thisMethodShouldDie();
 
+		void release();
+
+		void grabStaticScene();
+
 	private:
 		std::string _name;
 		Camera *_input;
+		Window *wInput;
+		Window *wModel;
+		Window *wMask;
+		Window *wCleanMask;
+		Window *wOutput;
+		Image *staticScene;
+		Image *background;
 
 };
 
