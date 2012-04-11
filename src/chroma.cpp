@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "chroma.h"
 #include "window.h"
 
@@ -38,14 +40,37 @@ void Chroma::incrementBinarizationThreshold(
 ) {
 	if (this->binarize_threshold < 255)
 		this->binarize_threshold++;
+	this->outputBinarizationThreshold();
 }
 
 void Chroma::decrementBinarizationThreshold(
 ) {
 	if (this->binarize_threshold > 0)
 		this->binarize_threshold--;
+	this->outputBinarizationThreshold();
 }
 
+void Chroma::outputBinarizationThreshold(
+) {
+	cout 
+		<< "Binarization threshold = " 
+		<< this->binarize_threshold 
+		<< endl;
+	flush(cout);
+}
+
+void Chroma::outputHelp(
+) {
+	cout 
+		<< "COMMANDS " << endl
+		<< "     S: Grab static scene" << endl 
+		<< "     X: Increment binarization threshold" << endl 
+		<< "     Z: Decrement binarization threshold" << endl 
+		<< "     H: This help" << endl << endl
+		<< " <ESC>: Exit program" << endl 
+	;
+	flush(cout);
+}
 
 void Chroma::release(
 ) {
@@ -127,17 +152,21 @@ bool Chroma::processKeys(
 	switch (key) {
 		case 27: 
 			return false;
-		case 65:
-		case 97:
+		case 's':
+		case 'S':
 			this->grabStaticScene();
 			break;
-		case 88:
-		case 120:
+		case 'x':
+		case 'X':
 			this->incrementBinarizationThreshold();
 			break;
-		case 90:
-		case 122:
+		case 'z':
+		case 'Z':
 			this->decrementBinarizationThreshold();
+			break;
+		case 'h':
+		case 'H':
+			this->outputHelp();
 			break;
 	}
 

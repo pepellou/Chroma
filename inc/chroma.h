@@ -51,6 +51,8 @@ class Chroma {
 		Image *cleanDifference;
 
 		int binarize_threshold;
+		void outputBinarizationThreshold();
+		void outputHelp();
 
 };
 
