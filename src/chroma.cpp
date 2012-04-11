@@ -37,6 +37,10 @@ Chroma::Chroma(
 	this->outputSignal = NULL;
 	this->difference = NULL;
 	this->cleanDifference = NULL;
+
+	this->diff_weight_r = 1;
+	this->diff_weight_g = 1;
+	this->diff_weight_b = 1;
 }
 
 void Chroma::increaseBinarizationThreshold(
@@ -134,6 +138,60 @@ void Chroma::resetCropDimensions(
 	this->outputCropDimensions();
 }
 
+void Chroma::increaseDiffWeightRed(
+) {
+	if (this->diff_weight_r < 1.0)
+		this->diff_weight_r += 0.1;
+	this->outputRGBWeights();
+}
+
+void Chroma::decreaseDiffWeightRed(
+) {
+	if (this->diff_weight_r > 0.0)
+		this->diff_weight_r -= 0.1;
+	this->outputRGBWeights();
+}
+
+void Chroma::increaseDiffWeightGreen(
+) {
+	if (this->diff_weight_g < 1.0)
+		this->diff_weight_g += 0.1;
+	this->outputRGBWeights();
+}
+
+void Chroma::decreaseDiffWeightGreen(
+) {
+	if (this->diff_weight_g > 0.0)
+		this->diff_weight_g -= 0.1;
+	this->outputRGBWeights();
+}
+
+void Chroma::increaseDiffWeightBlue(
+) {
+	if (this->diff_weight_b < 1.0)
+		this->diff_weight_b += 0.1;
+	this->outputRGBWeights();
+}
+
+void Chroma::decreaseDiffWeightBlue(
+) {
+	if (this->diff_weight_b > 0.0)
+		this->diff_weight_b -= 0.1;
+	this->outputRGBWeights();
+}
+
+
+void Chroma::cropOutput(
+) {
+	cvRectangle(
+		this->inputSignal->cvImage(),
+		cvPoint(this->crop_x, this->crop_y),
+		cvPoint(this->crop_x + this->crop_width, this->crop_y + this->crop_height),
+		cvScalar(0x00, 0x00, 0xff)
+	);
+	
+}
+
 void Chroma::outputCropDimensions(
 ) {
 	cout 
@@ -153,6 +211,17 @@ void Chroma::outputBinarizationThreshold(
 	flush(cout);
 }
 
+void Chroma::outputRGBWeights(
+) {
+	cout
+		<< "RGB weights = [ "
+		<< this->diff_weight_r << ", "
+		<< this->diff_weight_g << ", "
+		<< this->diff_weight_b << " ]"
+		<< endl;
+	flush(cout);
+}
+
 void Chroma::outputHelp(
 ) {
 	cout 
@@ -162,6 +231,9 @@ void Chroma::outputHelp(
 		<< "           =: Set default crop dimensions" << endl 
 		<< "           -: Decrease crop height" << endl 
 		<< "           +: Increase crop height" << endl 
+		<< "         1/2: Decrease/increase RED difference weight" << endl 
+		<< "         3/4: Decrease/increase GREEN difference weight" << endl 
+		<< "         5/6: Decrease/increase BLUE difference weight" << endl 
 		<< "           ?: This help" << endl
 		<< "           G: Grab static scene" << endl 
 		<< "     <RePag>: Increase binarization threshold" << endl 
@@ -220,8 +292,11 @@ void Chroma::computeDifference(
 			this->difference->cloneJustDimensions(1);
 	}
 
-	this->difference->mergeChannelsToMaximumAndStore(
-		this->cleanDifference
+	this->difference->mergeChannels(
+		this->cleanDifference,
+		this->diff_weight_r,
+		this->diff_weight_g,
+		this->diff_weight_b
 	);
 	this->cleanDifference->binarize(this->binarize_threshold);
 	this->cleanDifference->negativize();
@@ -290,6 +365,24 @@ bool Chroma::processKeys(
 		case 'S':
 			this->moveCropRight();
 			break;
+		case '1':
+			this->decreaseDiffWeightRed();
+			break;
+		case '2':
+			this->increaseDiffWeightRed();
+			break;
+		case '3':
+			this->decreaseDiffWeightGreen();
+			break;
+		case '4':
+			this->increaseDiffWeightGreen();
+			break;
+		case '5':
+			this->decreaseDiffWeightBlue();
+			break;
+		case '6':
+			this->increaseDiffWeightBlue();
+			break;
 		case 27: return false;
 	}
 
@@ -339,6 +432,8 @@ int Chroma::mainLoop(
 		this->computeDifference();
 
 		this->applyBackgroundToOutput();
+
+		this->cropOutput();
 
 		this->renderWindows();
 

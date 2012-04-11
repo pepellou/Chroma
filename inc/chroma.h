@@ -43,6 +43,13 @@ class Chroma {
 		void moveCropRight();
 		void moveCropUp();
 		void moveCropDown();
+		void cropOutput();
+		void increaseDiffWeightRed();
+		void decreaseDiffWeightRed();
+		void increaseDiffWeightGreen();
+		void decreaseDiffWeightGreen();
+		void increaseDiffWeightBlue();
+		void decreaseDiffWeightBlue();
 
 	private:
 		std::string _name;
@@ -65,10 +72,15 @@ class Chroma {
 		int crop_x;
 		int crop_y;
 
+		float diff_weight_r;
+		float diff_weight_g;
+		float diff_weight_b;
+
 		int binarize_threshold;
 		void outputBinarizationThreshold();
 		void outputHelp();
 		void outputCropDimensions();
+		void outputRGBWeights();
 		void adjustCropPosition();
 
 };

@@ -37,6 +37,12 @@ class Image {
 		Image *mergeChannelsToMaximum();
 		void mergeToMaximumWithAndStore(Image *anotherImage, Image *store);
 		void mergeChannelsToMaximumAndStore(Image *store);
+		void mergeChannels(
+			Image *store, 
+			float weight_channel1, 
+			float weight_channel2, 
+			float weight_channel3
+		);
 
 		void binarize(int threshold = 40);
 		void negativize();

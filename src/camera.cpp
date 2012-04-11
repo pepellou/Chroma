@@ -18,8 +18,10 @@ CvCapture *Camera::cvCapture(
 Camera *Camera::theDefaultCamera(
 ) {
 	if (Camera::_theDefaultCamera == NULL) {
-		Camera::_theDefaultCamera = 
-			new Camera(cvCreateCameraCapture(1));
+		CvCapture *cvCapture = cvCreateCameraCapture(1);
+		if (cvCapture == NULL)
+			cvCapture = cvCreateCameraCapture(0);
+		Camera::_theDefaultCamera = new Camera(cvCapture);
 	}
 	return Camera::_theDefaultCamera;
 }

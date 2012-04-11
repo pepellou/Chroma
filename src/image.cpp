@@ -150,7 +150,8 @@ Image *Image::mergeToMaximumWith(
 	return maximum;
 }
 
-Image *Image::mergeChannelsToMaximum() {
+Image *Image::mergeChannelsToMaximum(
+) {
 	Image *channel1 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
 	Image *channel2 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
 	Image *channel3 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
@@ -179,6 +180,40 @@ void Image::mergeChannelsToMaximumAndStore(
 
 	channel1->mergeToMaximumWithAndStore(channel2, toStore);
 	toStore->mergeToMaximumWithAndStore(channel3, toStore);
+
+	channel1->release();
+	channel2->release();
+	channel3->release();
+}
+
+void Image::mergeChannels(
+	Image *toStore,
+	float weight_channel1,
+	float weight_channel2,
+	float weight_channel3
+) {
+	Image *channel1 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel2 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel3 = this->cloneJustDimensions(1, IPL_DEPTH_8U);
+
+	this->splitTo(channel1, channel2, channel3);
+
+	cvAddWeighted(
+		channel1->_cvImage,
+		weight_channel1,
+		channel2->_cvImage,
+		weight_channel2,
+		0,
+		toStore->_cvImage
+	);
+	cvAddWeighted(
+		toStore->_cvImage,
+		weight_channel1 + weight_channel2,
+		channel3->_cvImage,
+		weight_channel3,
+		0,
+		toStore->_cvImage
+	);
 
 	channel1->release();
 	channel2->release();
