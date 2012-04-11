@@ -107,8 +107,16 @@ void Chroma::renderWindows(
 
 bool Chroma::processKeys(
 ) {
-	char c = cvWaitKey(33);
-	if( c == 27 ) return false;
+	char key = cvWaitKey(33);
+
+	switch (key) {
+		case 27: 
+			return false;
+		case 65:
+		case 97:
+			this->grabStaticScene();
+			break;
+	}
 
 	return true;
 }
