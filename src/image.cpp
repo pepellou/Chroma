@@ -98,6 +98,29 @@ void Image::setOriginPosition(
 	_cvImage->origin = position;
 }
 
+Image *Image::distorsionWith(
+	Image *anotherImage
+) {
+	Image *distorsion = anotherImage->clone();
+	cvDiv(
+		_cvImage, 
+		anotherImage->_cvImage, 
+		distorsion->_cvImage
+	);
+	return distorsion;
+}
+
+void Image::storeDistorsionWith(
+	Image *anotherImage,
+	Image *toStore
+) {
+	cvDiv(
+		_cvImage, 
+		anotherImage->_cvImage, 
+		toStore->_cvImage
+	);
+}
+
 Image *Image::differenceWith(
 	Image *anotherImage
 ) {

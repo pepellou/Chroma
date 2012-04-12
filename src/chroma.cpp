@@ -9,11 +9,15 @@ Chroma::Chroma(
 ) {
 	this->binarize_threshold = 40;
 
+	this->video_fentos = cvCaptureFromAVI("./tests/data/fentos_base.mov");
+	this->fps = ( int )cvGetCaptureProperty( this->video_fentos, CV_CAP_PROP_FPS );
+
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
 
 	this->wInput = new Window((char *) "INPUT", 1, 1);
 	this->wModel = new Window((char *) "MODEL", 400, 1);
+	this->wDistorsion = new Window((char *) "DISTORSION", 1, 700);
 	this->wDifference = new Window((char *) "DIFFERENCE", 800, 1);
 	this->wMask = new Window(
 		(char *) "MASK", 
@@ -30,6 +34,7 @@ Chroma::Chroma(
 	this->inputSignal = NULL;
 	this->outputSignal = NULL;
 	this->difference = NULL;
+	this->distorsion = NULL;
 	this->mask = NULL;
 	this->model = NULL;
 	this->staticScene = NULL;
@@ -448,6 +453,7 @@ void Chroma::release(
 	this->wInput->release();
 	this->wModel->release();
 	this->wDifference->release();
+	this->wDistorsion->release();
 	this->wMask->release();
 	this->wOutput->release();
 	this->_input->release();
@@ -458,6 +464,8 @@ void Chroma::release(
 		this->outputSignal->release();
 	if (this->difference != NULL)
 		this->difference->release();
+	if (this->distorsion != NULL)
+		this->distorsion->release();
 	if (this->mask != NULL)
 		this->mask->release();
 }
@@ -486,6 +494,39 @@ void Chroma::copyInputToOutput(
 		this->inputSignal->cloneTo(this->outputSignal);
 	else
 		this->outputSignal = this->inputSignal->clone();
+}
+
+void Chroma::computeDistorsion(
+) {
+	if (this->distorsion != NULL) {
+		this->inputSignal->storeDistorsionWith(
+			this->staticScene,
+			this->distorsion 
+		);
+	} else {
+		this->distorsion = 
+			this->inputSignal->distorsionWith(
+				this->staticScene
+			);
+	}
+	cvSetImageROI(this->distorsion->cvImage(), cvRect(0, 0, 20, 20));
+	CvScalar theDistorsion = cvAvg(this->distorsion->cvImage());
+	cvResetImageROI(this->distorsion->cvImage());
+	cout << "Distorsion = [ " 
+		<< theDistorsion.val[0] << ", "
+		<< theDistorsion.val[1] << ", "
+		<< theDistorsion.val[2] << ", "
+		<< theDistorsion.val[3] << "]" << endl;
+	uchar *data = (uchar *) this->model->cvImage()->imageData;
+	int i, j, k;
+	int width = this->model->cvImage()->width;
+	int height = this->model->cvImage()->height;
+	int channels = this->model->cvImage()->nChannels;
+	int step = this->model->cvImage()->widthStep;
+	for(i=0;i<height;i++)
+		for(j=0;j<width;j++)
+			for(k=0;k<channels;k++)
+				data[i*step+j*channels+k]=data[i*step+j*channels+k] * theDistorsion.val[k];
 }
 
 void Chroma::computeDifference(
@@ -523,18 +564,30 @@ void Chroma::applyBackgroundToOutput(
 	);
 }
 
+void Chroma::applyFentosToOutput(
+) {
+	Image *frame = new Image(cvQueryFrame(this->video_fentos));
+	if (frame != NULL) {
+		Image *fentos = frame->clone();
+		fentos->resizeLike(this->staticScene);
+		fentos->cloneTo(outputSignal);
+		fentos->release();
+	}
+}
+
 void Chroma::renderWindows(
 ) {
 	this->wInput->renderImage(this->inputSignal);
 	this->wModel->renderImage(this->model);
 	this->wDifference->renderImage(this->difference);
+	this->wDistorsion->renderImage(this->distorsion);
 	this->wMask->renderImage(this->mask);
 	this->wOutput->renderImage(this->outputSignal);
 }
 
 bool Chroma::processKeys(
 ) {
-	char key = cvWaitKey(33);
+	char key = cvWaitKey( 1000 / this->fps );
 
 	switch (key) {
 		case 45:
@@ -647,25 +700,28 @@ int Chroma::mainLoop(
 ) {
 	bool running = true;
 
+	int frame = 0;
+
 	while (running) {
+		this->grabInputSignal();
+		this->copyInputToOutput();
+
 		this->copyStaticToModel();
 		this->adjustModel();
-
-		this->grabInputSignal();
-
-		this->copyInputToOutput();
+		//this->computeDistorsion();
 
 		this->computeDifference();
 		this->adjustDifference();
 
 		this->applyBackgroundToOutput();
+		this->applyFentosToOutput();
 		this->cropOutput();
 		this->adjustOutput();
 
 		this->renderWindows();
 
 		running = this->processKeys();
-
+		frame++;
 	}
 	this->release();
 	return 0;

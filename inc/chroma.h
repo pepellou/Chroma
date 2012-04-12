@@ -29,6 +29,7 @@ class Chroma {
 		void copyInputToOutput();
 		void grabInputSignal();
 		void computeDifference();
+		void computeDistorsion();
 		void applyBackgroundToOutput();
 		void renderWindows();
 		bool processKeys();
@@ -62,6 +63,7 @@ class Chroma {
 		Window *wInput;
 		Window *wModel;
 		Window *wDifference;
+		Window *wDistorsion;
 		Window *wMask;
 		Window *wOutput;
 		Image *staticScene;
@@ -70,6 +72,7 @@ class Chroma {
 		Image *inputSignal;
 		Image *outputSignal;
 		Image *difference;
+		Image *distorsion;
 		Image *mask;
 
 		Image *currentOperationImage;
@@ -103,6 +106,10 @@ class Chroma {
 		float weight_difference_g;
 		float weight_difference_b;
 
+		CvCapture *video_fentos;
+		void applyFentosToOutput();
+
+		int fps;
 };
 
 #endif

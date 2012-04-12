@@ -31,6 +31,8 @@ class Image {
 		void resizeLike(Image *otherImage);
 		int originPosition();
 		void setOriginPosition(int position);
+		void storeDistorsionWith(Image *anotherImage, Image *toStore);
+		Image *distorsionWith(Image *anotherImage);
 		void storeDifferenceWith(Image *anotherImage, Image *toStore);
 		Image *differenceWith(Image *anotherImage);
 		Image *mergeToMaximumWith(Image *anotherImage);
