@@ -12,35 +12,65 @@ Chroma::Chroma(
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
 
-	this->wInput = new Window((char *) "Entrada", 1, 1);
-	this->wModel = new Window((char *) "Modelo", 400, 1);
-	this->wDifference = new Window((char *) "Diferencia", 800, 1);
-	this->wCleanDifference = new Window(
-		(char *) "Diferencia limpia", 
+	this->wInput = new Window((char *) "INPUT", 1, 1);
+	this->wModel = new Window((char *) "MODEL", 400, 1);
+	this->wDifference = new Window((char *) "DIFFERENCE", 800, 1);
+	this->wMask = new Window(
+		(char *) "MASK", 
 		1, 
 		350
 	);
 	this->wOutput = new Window(
-		(char *) "Salida", 
+		(char *) "OUTPUT", 
 		400, 
 		350, 
 		CV_WINDOW_AUTOSIZE
 	);
 
+	this->inputSignal = NULL;
+	this->outputSignal = NULL;
+	this->difference = NULL;
+	this->mask = NULL;
+	this->model = NULL;
+	this->staticScene = NULL;
+
 	grabStaticScene();
+
 	this->background = new Image("./tests/data/fondo.jpg");
 	this->background->resizeLike(this->staticScene);
 	this->maxCropWidth = this->background->cvImage()->width;
 	this->maxCropHeight = this->background->cvImage()->height;
 	this->resetCropDimensions();
-	this->inputSignal = NULL;
-	this->outputSignal = NULL;
-	this->difference = NULL;
-	this->cleanDifference = NULL;
 
-	this->diff_weight_r = 1;
-	this->diff_weight_g = 1;
-	this->diff_weight_b = 1;
+	this->operateOnModel();
+
+	this->weight_difference_r = 1.0;
+	this->weight_difference_g = 1.0;
+	this->weight_difference_b = 1.0;
+	this->weight_output_r = 1.0;
+	this->weight_output_g = 1.0;
+	this->weight_output_b = 1.0;
+	this->weight_model_r = 1.0;
+	this->weight_model_g = 1.0;
+	this->weight_model_b = 1.0;
+}
+
+void Chroma::operateOnDifference(
+) {
+	this->currentOperationImage = this->difference;
+	cout << "Current operation on DIFFERENCE" << endl;
+}
+
+void Chroma::operateOnModel(
+) {
+	this->currentOperationImage = this->model;
+	cout << "Current operation on MODEL" << endl;
+}
+
+void Chroma::operateOnOutput(
+) {
+	this->currentOperationImage = this->outputSignal;
+	cout << "Current operation on OUTPUT" << endl;
 }
 
 void Chroma::increaseBinarizationThreshold(
@@ -138,48 +168,208 @@ void Chroma::resetCropDimensions(
 	this->outputCropDimensions();
 }
 
-void Chroma::increaseDiffWeightRed(
+void Chroma::increaseWeightRed(
 ) {
-	if (this->diff_weight_r < 1.0)
-		this->diff_weight_r += 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_r < 1.0)
+			this->weight_difference_r += 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_r < 1.0)
+			this->weight_model_r += 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_r < 1.0)
+			this->weight_output_r += 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
-void Chroma::decreaseDiffWeightRed(
+void Chroma::decreaseWeightRed(
 ) {
-	if (this->diff_weight_r > 0.0)
-		this->diff_weight_r -= 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_r > 0.0)
+			this->weight_difference_r -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_r > 0.0)
+			this->weight_model_r -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_r > 0.0)
+			this->weight_output_r -= 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
-void Chroma::increaseDiffWeightGreen(
+void Chroma::increaseWeightGreen(
 ) {
-	if (this->diff_weight_g < 1.0)
-		this->diff_weight_g += 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_g < 1.0)
+			this->weight_difference_g += 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_g < 1.0)
+			this->weight_model_g += 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_g < 1.0)
+			this->weight_output_g += 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
-void Chroma::decreaseDiffWeightGreen(
+void Chroma::decreaseWeightGreen(
 ) {
-	if (this->diff_weight_g > 0.0)
-		this->diff_weight_g -= 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_g > 0.0)
+			this->weight_difference_g -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_g > 0.0)
+			this->weight_model_g -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_g > 0.0)
+			this->weight_output_g -= 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
-void Chroma::increaseDiffWeightBlue(
+void Chroma::increaseWeightBlue(
 ) {
-	if (this->diff_weight_b < 1.0)
-		this->diff_weight_b += 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_b < 1.0)
+			this->weight_difference_b += 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_b < 1.0)
+			this->weight_model_b += 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_b < 1.0)
+			this->weight_output_b += 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
-void Chroma::decreaseDiffWeightBlue(
+void Chroma::decreaseWeightBlue(
 ) {
-	if (this->diff_weight_b > 0.0)
-		this->diff_weight_b -= 0.1;
+	if (this->currentOperationImage == NULL) {
+		cout << "Not selected an operation image" << endl;
+	}
+	
+	if (this->currentOperationImage == this->difference) {
+		if (this->weight_difference_b > 0.0)
+			this->weight_difference_b -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->model) {
+		if (this->weight_model_b > 0.0)
+			this->weight_model_b -= 0.1;
+	}
+
+	if (this->currentOperationImage == this->outputSignal) {
+		if (this->weight_output_b > 0.0)
+			this->weight_output_b -= 0.1;
+	}
+
 	this->outputRGBWeights();
 }
 
+void Chroma::adjustImage(
+	Image *image, 
+	float r, 
+	float g, 
+	float b
+) {
+	Image *channel1 = image->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel2 = image->cloneJustDimensions(1, IPL_DEPTH_8U);
+	Image *channel3 = image->cloneJustDimensions(1, IPL_DEPTH_8U);
+
+	image->splitTo(channel1, channel2, channel3);
+
+	cvScale(channel1->cvImage(), channel1->cvImage(), r);
+	cvScale(channel2->cvImage(), channel2->cvImage(), g);
+	cvScale(channel3->cvImage(), channel3->cvImage(), b);
+
+	cvMerge(
+		channel1->cvImage(),
+		channel2->cvImage(),
+		channel3->cvImage(),
+		NULL,
+		image->cvImage()
+	);
+
+	channel1->release();
+	channel2->release();
+	channel3->release();
+}
+
+void Chroma::adjustOutput(
+) {
+	this->adjustImage(
+		this->outputSignal,
+		this->weight_output_r,
+		this->weight_output_g,
+		this->weight_output_b
+	);
+}
+
+void Chroma::adjustModel(
+) {
+	this->adjustImage(
+		this->model,
+		this->weight_model_r,
+		this->weight_model_g,
+		this->weight_model_b
+	);
+}
+
+void Chroma::adjustDifference(
+) {
+	this->adjustImage(
+		this->difference,
+		this->weight_difference_r,
+		this->weight_difference_g,
+		this->weight_difference_b
+	);
+}
 
 void Chroma::cropOutput(
 ) {
@@ -214,10 +404,16 @@ void Chroma::outputBinarizationThreshold(
 void Chroma::outputRGBWeights(
 ) {
 	cout
-		<< "RGB weights = [ "
-		<< this->diff_weight_r << ", "
-		<< this->diff_weight_g << ", "
-		<< this->diff_weight_b << " ]"
+		<< "RGB weights: MODEL [ "
+		<< this->weight_model_r << ", "
+		<< this->weight_model_g << ", "
+		<< this->weight_model_b << " ], DIFFERENCE [ "
+		<< this->weight_difference_r << ", "
+		<< this->weight_difference_g << ", "
+		<< this->weight_difference_b << " ], OUTPUT [ "
+		<< this->weight_output_r << ", "
+		<< this->weight_output_g << ", "
+		<< this->weight_output_b << " ]"
 		<< endl;
 	flush(cout);
 }
@@ -231,11 +427,14 @@ void Chroma::outputHelp(
 		<< "           =: Set default crop dimensions" << endl 
 		<< "           -: Decrease crop height" << endl 
 		<< "           +: Increase crop height" << endl 
-		<< "         1/2: Decrease/increase RED difference weight" << endl 
-		<< "         3/4: Decrease/increase GREEN difference weight" << endl 
-		<< "         5/6: Decrease/increase BLUE difference weight" << endl 
+		<< "         1/2: Decrease/increase RED weight" << endl 
+		<< "         3/4: Decrease/increase GREEN weight" << endl 
+		<< "         5/6: Decrease/increase BLUE weight" << endl 
 		<< "           ?: This help" << endl
 		<< "           G: Grab static scene" << endl 
+		<< "           D: Operate on DIFFERENCE" << endl 
+		<< "           M: Operate on MODEL" << endl 
+		<< "           O: Operate on OUTPUT" << endl 
 		<< "     <RePag>: Increase binarization threshold" << endl 
 		<< "     <AvPag>: Decrease binarization threshold" << endl 
 		<< endl << "   <CURSORS>: Move crop" << endl
@@ -249,23 +448,36 @@ void Chroma::release(
 	this->wInput->release();
 	this->wModel->release();
 	this->wDifference->release();
-	this->wCleanDifference->release();
+	this->wMask->release();
 	this->wOutput->release();
 	this->_input->release();
 	this->staticScene->release();
+	this->model->release();
 	this->background->release();
 	if (this->outputSignal != NULL)
 		this->outputSignal->release();
 	if (this->difference != NULL)
 		this->difference->release();
-	if (this->cleanDifference != NULL)
-		this->cleanDifference->release();
+	if (this->mask != NULL)
+		this->mask->release();
 }
 
 void Chroma::grabStaticScene(
 ) {
 	Camera* camera = input();
+	if (this->staticScene != NULL) {
+		this->staticScene->release();
+	}
 	this->staticScene = camera->grabStaticScene();
+}
+
+void Chroma::copyStaticToModel(
+) {
+	if (this->model == NULL) {
+		this->model = this->staticScene->clone();
+	} else {
+		this->staticScene->cloneTo(this->model);
+	}
 }
 
 void Chroma::copyInputToOutput(
@@ -279,44 +491,44 @@ void Chroma::copyInputToOutput(
 void Chroma::computeDifference(
 ) {
 	if (this->difference != NULL) {
-		this->staticScene->storeDifferenceWith(
+		this->model->storeDifferenceWith(
 			this->inputSignal, 
 			this->difference
 		);
 	} else {
 		this->difference = 
-			this->staticScene->differenceWith(
+			this->model->differenceWith(
 				this->inputSignal
 			);
-		this->cleanDifference = 
+		this->mask = 
 			this->difference->cloneJustDimensions(1);
 	}
 
 	this->difference->mergeChannels(
-		this->cleanDifference,
-		this->diff_weight_r,
-		this->diff_weight_g,
-		this->diff_weight_b
+		this->mask,
+		this->weight_difference_r,
+		this->weight_difference_g,
+		this->weight_difference_b
 	);
-	this->cleanDifference->binarize(this->binarize_threshold);
-	this->cleanDifference->negativize();
-	//this->cleanDifference->cleanIsolatedDots();
+	this->mask->binarize(this->binarize_threshold);
+	this->mask->negativize();
+	//this->mask->cleanIsolatedDots();
 }
 
 void Chroma::applyBackgroundToOutput(
 ) {
 	this->background->cloneTo(
 		this->outputSignal, 
-		this->cleanDifference
+		this->mask
 	);
 }
 
 void Chroma::renderWindows(
 ) {
 	this->wInput->renderImage(this->inputSignal);
-	this->wModel->renderImage(this->staticScene);
+	this->wModel->renderImage(this->model);
 	this->wDifference->renderImage(this->difference);
-	this->wCleanDifference->renderImage(this->cleanDifference);
+	this->wMask->renderImage(this->mask);
 	this->wOutput->renderImage(this->outputSignal);
 }
 
@@ -366,22 +578,34 @@ bool Chroma::processKeys(
 			this->moveCropRight();
 			break;
 		case '1':
-			this->decreaseDiffWeightRed();
+			this->decreaseWeightRed();
 			break;
 		case '2':
-			this->increaseDiffWeightRed();
+			this->increaseWeightRed();
 			break;
 		case '3':
-			this->decreaseDiffWeightGreen();
+			this->decreaseWeightGreen();
 			break;
 		case '4':
-			this->increaseDiffWeightGreen();
+			this->increaseWeightGreen();
 			break;
 		case '5':
-			this->decreaseDiffWeightBlue();
+			this->decreaseWeightBlue();
 			break;
 		case '6':
-			this->increaseDiffWeightBlue();
+			this->increaseWeightBlue();
+			break;
+		case 'd':
+		case 'D':
+			this->operateOnDifference();
+			break;
+		case 'm':
+		case 'M':
+			this->operateOnModel();
+			break;
+		case 'o':
+		case 'O':
+			this->operateOnOutput();
 			break;
 		case 27: return false;
 	}
@@ -424,16 +648,19 @@ int Chroma::mainLoop(
 	bool running = true;
 
 	while (running) {
+		this->copyStaticToModel();
+		this->adjustModel();
 
 		this->grabInputSignal();
 
 		this->copyInputToOutput();
 
 		this->computeDifference();
+		this->adjustDifference();
 
 		this->applyBackgroundToOutput();
-
 		this->cropOutput();
+		this->adjustOutput();
 
 		this->renderWindows();
 

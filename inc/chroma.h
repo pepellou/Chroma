@@ -25,6 +25,7 @@ class Chroma {
 		void release();
 
 		void grabStaticScene();
+		void copyStaticToModel();
 		void copyInputToOutput();
 		void grabInputSignal();
 		void computeDifference();
@@ -44,12 +45,16 @@ class Chroma {
 		void moveCropUp();
 		void moveCropDown();
 		void cropOutput();
-		void increaseDiffWeightRed();
-		void decreaseDiffWeightRed();
-		void increaseDiffWeightGreen();
-		void decreaseDiffWeightGreen();
-		void increaseDiffWeightBlue();
-		void decreaseDiffWeightBlue();
+		void increaseWeightRed();
+		void decreaseWeightRed();
+		void increaseWeightGreen();
+		void decreaseWeightGreen();
+		void increaseWeightBlue();
+		void decreaseWeightBlue();
+
+		void operateOnModel();
+		void operateOnOutput();
+		void operateOnDifference();
 
 	private:
 		std::string _name;
@@ -57,14 +62,18 @@ class Chroma {
 		Window *wInput;
 		Window *wModel;
 		Window *wDifference;
-		Window *wCleanDifference;
+		Window *wMask;
 		Window *wOutput;
 		Image *staticScene;
+		Image *model;
 		Image *background;
 		Image *inputSignal;
 		Image *outputSignal;
 		Image *difference;
-		Image *cleanDifference;
+		Image *mask;
+
+		Image *currentOperationImage;
+
 		int crop_width;
 		int crop_height;
 		int maxCropHeight;
@@ -72,16 +81,27 @@ class Chroma {
 		int crop_x;
 		int crop_y;
 
-		float diff_weight_r;
-		float diff_weight_g;
-		float diff_weight_b;
-
 		int binarize_threshold;
 		void outputBinarizationThreshold();
 		void outputHelp();
 		void outputCropDimensions();
 		void outputRGBWeights();
 		void adjustCropPosition();
+
+		void adjustOutput();
+		void adjustDifference();
+		void adjustModel();
+		void adjustImage(Image *image, float r, float g, float b);
+
+		float weight_output_r;
+		float weight_output_g;
+		float weight_output_b;
+		float weight_model_r;
+		float weight_model_g;
+		float weight_model_b;
+		float weight_difference_r;
+		float weight_difference_g;
+		float weight_difference_b;
 
 };
 
