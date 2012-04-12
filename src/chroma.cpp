@@ -9,8 +9,10 @@ Chroma::Chroma(
 ) {
 	this->binarize_threshold = 40;
 
-	//this->video_fentos = new Camera(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
+	this->video_fentos = new Camera(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
 	this->fps = this->video_fentos->fps();
+	cout << "FPS = " << fps << endl;
+	flush(cout);
 
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
@@ -580,7 +582,7 @@ void Chroma::renderWindows(
 	this->wInput->renderImage(this->inputSignal);
 	this->wModel->renderImage(this->model);
 	this->wDifference->renderImage(this->difference);
-	this->wDistorsion->renderImage(this->distorsion);
+	//this->wDistorsion->renderImage(this->distorsion);
 	this->wMask->renderImage(this->mask);
 	this->wOutput->renderImage(this->outputSignal);
 }
@@ -699,9 +701,6 @@ Camera *Chroma::input(
 int Chroma::mainLoop(
 ) {
 	bool running = true;
-
-	int frame = 0;
-
 	while (running) {
 		this->grabInputSignal();
 		this->copyInputToOutput();
@@ -721,7 +720,6 @@ int Chroma::mainLoop(
 		this->renderWindows();
 
 		running = this->processKeys();
-		frame++;
 	}
 	this->release();
 	return 0;
