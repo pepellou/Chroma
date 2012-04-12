@@ -572,8 +572,19 @@ void Chroma::applyFentosToOutput(
 	if (frame != NULL) {
 		Image *fentos = frame->clone();
 		fentos->resizeLike(this->staticScene);
-		fentos->cloneTo(outputSignal);
+		Image *fentosMask = fentos->cloneJustDimensions(1, IPL_DEPTH_8U);
+		cvInRangeS(
+			fentos->cvImage(),
+			cvScalar(1, 1, 1, 0),
+			cvScalar(255, 255, 255, 255),
+			fentosMask->cvImage()
+		);
+		fentos->cloneTo(
+			this->outputSignal,
+			fentosMask
+		);
 		fentos->release();
+		fentosMask->release();
 	}
 }
 
@@ -589,7 +600,8 @@ void Chroma::renderWindows(
 
 bool Chroma::processKeys(
 ) {
-	char key = cvWaitKey( 1000 / this->fps );
+	int speed = 3;
+	char key = cvWaitKey( 1000 * speed / this->fps / speed );
 
 	switch (key) {
 		case 45:
@@ -713,7 +725,7 @@ int Chroma::mainLoop(
 		this->adjustDifference();
 
 		this->applyBackgroundToOutput();
-		//this->applyFentosToOutput();
+		this->applyFentosToOutput();
 		this->cropOutput();
 		this->adjustOutput();
 

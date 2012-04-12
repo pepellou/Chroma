@@ -38,6 +38,8 @@ Image *Camera::grabCurrentFrame(
 		this->_currentFrame = new Image(
 			currentCvFrame
 		);
+	} else {
+		this->_currentFrame->setCvImage(currentCvFrame);
 	}
 	this->_processed_frames++;
 	return this->_currentFrame;
