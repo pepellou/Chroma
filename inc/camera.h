@@ -16,6 +16,7 @@ class Camera {
 		Image *grabCurrentFrame();
 		Image *grabStaticScene();
 		long processedFrames();
+		int fps();
 
 	private:
 		static Camera *_theDefaultCamera;

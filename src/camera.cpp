@@ -59,3 +59,7 @@ long Camera::processedFrames(
 	return this->_processed_frames;
 }
 
+int Camera::fps(
+) {
+	return ( int ) cvGetCaptureProperty( this->_cvCapture, CV_CAP_PROP_FPS );
+}

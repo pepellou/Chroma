@@ -106,7 +106,7 @@ class Chroma {
 		float weight_difference_g;
 		float weight_difference_b;
 
-		CvCapture *video_fentos;
+		Camera *video_fentos;
 		void applyFentosToOutput();
 
 		int fps;

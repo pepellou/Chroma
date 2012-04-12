@@ -9,8 +9,8 @@ Chroma::Chroma(
 ) {
 	this->binarize_threshold = 40;
 
-	this->video_fentos = cvCaptureFromAVI("./tests/data/fentos_base.mov");
-	this->fps = ( int )cvGetCaptureProperty( this->video_fentos, CV_CAP_PROP_FPS );
+	//this->video_fentos = new Camera(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
+	this->fps = this->video_fentos->fps();
 
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
@@ -566,7 +566,7 @@ void Chroma::applyBackgroundToOutput(
 
 void Chroma::applyFentosToOutput(
 ) {
-	Image *frame = new Image(cvQueryFrame(this->video_fentos));
+	Image *frame = this->video_fentos->grabCurrentFrame();
 	if (frame != NULL) {
 		Image *fentos = frame->clone();
 		fentos->resizeLike(this->staticScene);
@@ -714,7 +714,7 @@ int Chroma::mainLoop(
 		this->adjustDifference();
 
 		this->applyBackgroundToOutput();
-		this->applyFentosToOutput();
+		//this->applyFentosToOutput();
 		this->cropOutput();
 		this->adjustOutput();
 
