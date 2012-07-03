@@ -7,6 +7,13 @@ using namespace std;
 
 bool Messages::enable = true;
 
+void Messages::error(
+	const char* message
+) {
+	forcePut(message);
+	flushLine();
+}
+
 void Messages::info(
 	const char* message
 ) {
@@ -87,6 +94,12 @@ void Messages::info(
 	put(value9);
 	put(message10);
 	flushLine();
+}
+
+void Messages::forcePut(
+	const char *text
+) {
+	cout << text;
 }
 
 void Messages::put(

@@ -6,6 +6,7 @@ class Messages {
 	public:
 		static bool enable;
 
+		static void error(const char *message);
 		static void info(const char *message);
 		static void info(
 			const char *message, 
@@ -45,6 +46,7 @@ class Messages {
 		);
 
 	private:
+		static void forcePut(const char *text);
 		static void put(const char *text);
 		static void put(int value);
 		static void put(float value);
