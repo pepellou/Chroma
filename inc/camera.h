@@ -10,6 +10,7 @@ class Camera {
 
 	public:
 		Camera();
+		~Camera();
 		static Camera *theDefaultCamera();
 
 		CvCapture *getInput();
@@ -17,7 +18,6 @@ class Camera {
 		Image *getCurrentFrame();
 
 		void setInput(CvCapture *cvCapture);
-		void release();
 
 	private:
 		static Camera *_theDefaultCamera;

@@ -33,7 +33,7 @@ Camera *Camera::theDefaultCamera(
 	return Camera::_theDefaultCamera;
 }
 
-void Camera::release(
+Camera::~Camera(
 ) {
 	cvReleaseCapture(&_input);
 }
