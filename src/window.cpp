@@ -14,7 +14,7 @@ Window::Window(
 void Window::renderImage(
 	Image *image
 ) {
-	cvShowImage(this->_name, image->cvImage());
+	cvShowImage(this->_name, image->getInput());
 }
 
 void Window::release(

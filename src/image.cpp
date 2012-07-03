@@ -1,41 +1,53 @@
 #include "image.h"
 
 Image::Image(
-	IplImage *cvImage
 ) {
-	this->_cvImage = cvImage;
+	this->_input = NULL;
+}
+
+Image::Image(
+	IplImage *input
+) {
+	this->setInput(input);
 }
 
 Image::Image(
 	const char *filePath
 ) {
-	this->_cvImage = cvLoadImage(filePath);
+	this->setInput(filePath);
 }
 
-IplImage *Image::cvImage(
+IplImage *Image::getInput(
 ) {
-	return this->_cvImage;
+	return this->_input;
 }
 
-void Image::setCvImage(
-	IplImage *cvImage
+void Image::setInput(
+	IplImage *input
 ) {
-	this->_cvImage = cvImage;
+	this->_input = input;
+}
+
+void Image::setInput(
+	const char *filePath
+) {
+	this->_input = cvLoadImage(filePath);
 }
 
 void Image::release(
 ) {
-	cvReleaseImage(&_cvImage);
+	cvReleaseImage(&_input);
 }
 
 bool Image::isValid(
 ) {
-	return (_cvImage != NULL);
+	return (_input != NULL);
 }
 
 Image *Image::clone(
 ) {
-	Image *imageClone = new Image(cvCloneImage(_cvImage));
+	Image *imageClone = new Image();
+	imageClone->setInput(cvCloneImage(_input));
 	imageClone->setOriginPosition(TOP_LEFT); 
 	return imageClone;
 }
@@ -45,16 +57,18 @@ Image *Image::cloneJustDimensions(
 	int depth
 ) {
 	if (depth == -1)
-		depth = _cvImage->depth;
+		depth = _input->depth;
 	if (num_channels == -1)
-		num_channels = _cvImage->nChannels;
-	return new Image(
+		num_channels = _input->nChannels;
+	Image *theClone = new Image();
+	theClone->setInput(
 		cvCreateImage(
-			cvGetSize(_cvImage), 
+			cvGetSize(_input), 
 			depth, 
 			num_channels
 		)
 	);
+	return theClone;
 }
 
 void Image::cloneTo(
@@ -63,41 +77,43 @@ void Image::cloneTo(
 ) {
 	if (mask == NULL) {
 		cvCopy(
-			_cvImage, 
-			anotherImage->_cvImage
+			_input, 
+			anotherImage->_input
 		);
 	} else {
 		cvCopy(
-			_cvImage, 
-			anotherImage->_cvImage, 
-			mask->_cvImage
+			_input, 
+			anotherImage->_input, 
+			mask->_input
 		);
 	}
 }
 
 void Image::flip(
 ) {
-	cvFlip(_cvImage);
+	cvFlip(_input);
 }
 
 void Image::resizeLike(
 	Image *anotherImage
 ) {
 	Image *tmp = anotherImage->clone();
-	cvResize(_cvImage, tmp->cvImage()); 
+	cvResize(_input, tmp->getInput()); 
 	release();
-	setCvImage(tmp->cvImage());
+	setInput(tmp->getInput());
 }
 
-int Image::originPosition(
+int Image::getOriginPosition(
 ) {
-	return _cvImage->origin;
+	if (_input == NULL)
+		return -1;
+	return _input->origin;
 }
 
 void Image::setOriginPosition(
 	int position
 ) {
-	_cvImage->origin = position;
+	_input->origin = position;
 }
 
 Image *Image::distorsionWith(
@@ -105,9 +121,9 @@ Image *Image::distorsionWith(
 ) {
 	Image *distorsion = anotherImage->clone();
 	cvDiv(
-		_cvImage, 
-		anotherImage->_cvImage, 
-		distorsion->_cvImage
+		_input, 
+		anotherImage->_input, 
+		distorsion->_input
 	);
 	return distorsion;
 }
@@ -117,9 +133,9 @@ void Image::storeDistorsionWith(
 	Image *toStore
 ) {
 	cvDiv(
-		_cvImage, 
-		anotherImage->_cvImage, 
-		toStore->_cvImage
+		_input, 
+		anotherImage->_input, 
+		toStore->_input
 	);
 }
 
@@ -128,9 +144,9 @@ Image *Image::differenceWith(
 ) {
 	Image *difference = anotherImage->clone();
 	cvAbsDiff(
-		_cvImage, 
-		anotherImage->_cvImage, 
-		difference->_cvImage
+		_input, 
+		anotherImage->_input, 
+		difference->_input
 	);
 	return difference;
 }
@@ -140,9 +156,9 @@ void Image::storeDifferenceWith(
 	Image *toStore
 ) {
 	cvAbsDiff(
-		_cvImage, 
-		anotherImage->_cvImage, 
-		toStore->_cvImage
+		_input, 
+		anotherImage->_input, 
+		toStore->_input
 	);
 }
 
@@ -152,10 +168,10 @@ void Image::splitTo(
 	Image *channel3
 ) {
 	cvSplit(
-		_cvImage, 
-		channel1->_cvImage, 
-		channel2->_cvImage, 
-		channel3->_cvImage, 
+		_input, 
+		channel1->_input, 
+		channel2->_input, 
+		channel3->_input, 
 		NULL
 	);
 }
@@ -164,14 +180,14 @@ void Image::mergeToMaximumWithAndStore(
 	Image *anotherImage,
 	Image *toStore
 ) {
-	cvMax(_cvImage, anotherImage->_cvImage, toStore->_cvImage);
+	cvMax(_input, anotherImage->_input, toStore->_input);
 }
 
 Image *Image::mergeToMaximumWith(
 	Image *anotherImage
 ) {
 	Image *maximum = anotherImage->clone();
-	cvMax(_cvImage, anotherImage->_cvImage, maximum->_cvImage);
+	cvMax(_input, anotherImage->_input, maximum->_input);
 	return maximum;
 }
 
@@ -224,20 +240,20 @@ void Image::mergeChannels(
 	this->splitTo(channel1, channel2, channel3);
 
 	cvAddWeighted(
-		channel1->_cvImage,
+		channel1->_input,
 		weight_channel1,
-		channel2->_cvImage,
+		channel2->_input,
 		weight_channel2,
 		0,
-		toStore->_cvImage
+		toStore->_input
 	);
 	cvAddWeighted(
-		toStore->_cvImage,
+		toStore->_input,
 		weight_channel1 + weight_channel2,
-		channel3->_cvImage,
+		channel3->_input,
 		weight_channel3,
 		0,
-		toStore->_cvImage
+		toStore->_input
 	);
 
 	channel1->release();
@@ -249,8 +265,8 @@ void Image::binarize(
 	int threshold
 ) {
 	cvThreshold(
-		_cvImage, 
-		_cvImage, 
+		_input, 
+		_input, 
 		 threshold, 
 		255, 
 		CV_THRESH_BINARY
@@ -259,20 +275,20 @@ void Image::binarize(
 
 void Image::negativize(
 ) {
-	cvNot(_cvImage, _cvImage);
+	cvNot(_input, _input);
 }
 
 Image *Image::cleanIsolatedDots(
 ) {
 	Image *clean = this->clone();
 return clean;
-	uchar *dataIn  = (uchar *) this->_cvImage->imageData;
-	uchar *dataOut = (uchar *) clean->_cvImage->imageData;
+	uchar *dataIn  = (uchar *) this->_input->imageData;
+	uchar *dataOut = (uchar *) clean->_input->imageData;
 	int y, x, c;
-	int width = _cvImage->width;
-	int height = _cvImage->height;
-	int channels = _cvImage->nChannels;
-	int step = _cvImage->widthStep;
+	int width = _input->width;
+	int height = _input->height;
+	int channels = _input->nChannels;
+	int step = _input->widthStep;
 
 	int around_points[][2] = { {-1, -1}, {1, -1}, {1, 1},   {-1, 1} };
 	int total_around = sizeof(around_points) / sizeof(int);
@@ -309,12 +325,14 @@ return clean;
 
 Image *Image::duplicate(
 ) {
-	IplImage *in = _cvImage;
+	IplImage *in = _input;
 	IplImage* out = cvCreateImage(
 		cvSize(2*in->width, 2*in->height),
 		IPL_DEPTH_8U,
 		in->nChannels
 	);
 	cvPyrUp(in, out);
-	return new Image(out);
+	Image *theDuplicate = new Image();
+	theDuplicate->setInput(out);
+	return theDuplicate;
 }

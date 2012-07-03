@@ -15,6 +15,7 @@ TEST=tests/chroma.cpp \
 	tests/tests.cpp
 
 TEST=tests/camera.cpp \
+	tests/image.cpp \
 	tests/tests.cpp
 
 MAIN=src/main.cpp

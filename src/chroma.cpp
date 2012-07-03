@@ -45,10 +45,11 @@ Chroma::Chroma(
 
 	grabStaticScene();
 
-	this->background = new Image("./tests/data/fondo.jpg");
+	this->background = new Image();
+	this->background->setInput("./tests/data/fondo.jpg");
 	this->background->resizeLike(this->staticScene);
-	this->maxCropWidth = this->background->cvImage()->width;
-	this->maxCropHeight = this->background->cvImage()->height;
+	this->maxCropWidth = this->background->getInput()->width;
+	this->maxCropHeight = this->background->getInput()->height;
 	this->resetCropDimensions();
 
 	this->operateOnModel();
@@ -333,16 +334,16 @@ void Chroma::adjustImage(
 
 	image->splitTo(channel1, channel2, channel3);
 
-	cvScale(channel1->cvImage(), channel1->cvImage(), r);
-	cvScale(channel2->cvImage(), channel2->cvImage(), g);
-	cvScale(channel3->cvImage(), channel3->cvImage(), b);
+	cvScale(channel1->getInput(), channel1->getInput(), r);
+	cvScale(channel2->getInput(), channel2->getInput(), g);
+	cvScale(channel3->getInput(), channel3->getInput(), b);
 
 	cvMerge(
-		channel1->cvImage(),
-		channel2->cvImage(),
-		channel3->cvImage(),
+		channel1->getInput(),
+		channel2->getInput(),
+		channel3->getInput(),
 		NULL,
-		image->cvImage()
+		image->getInput()
 	);
 
 	channel1->release();
@@ -383,7 +384,7 @@ void Chroma::adjustDifference(
 void Chroma::cropOutput(
 ) {
 	cvRectangle(
-		this->inputSignal->cvImage(),
+		this->inputSignal->getInput(),
 		cvPoint(this->crop_x, this->crop_y),
 		cvPoint(this->crop_x + this->crop_width, this->crop_y + this->crop_height),
 		cvScalar(0x00, 0x00, 0xff)
@@ -513,20 +514,20 @@ void Chroma::computeDistorsion(
 				this->staticScene
 			);
 	}
-	cvSetImageROI(this->distorsion->cvImage(), cvRect(0, 0, 20, 20));
-	CvScalar theDistorsion = cvAvg(this->distorsion->cvImage());
-	cvResetImageROI(this->distorsion->cvImage());
+	cvSetImageROI(this->distorsion->getInput(), cvRect(0, 0, 20, 20));
+	CvScalar theDistorsion = cvAvg(this->distorsion->getInput());
+	cvResetImageROI(this->distorsion->getInput());
 	cout << "Distorsion = [ " 
 		<< theDistorsion.val[0] << ", "
 		<< theDistorsion.val[1] << ", "
 		<< theDistorsion.val[2] << ", "
 		<< theDistorsion.val[3] << "]" << endl;
-	uchar *data = (uchar *) this->model->cvImage()->imageData;
+	uchar *data = (uchar *) this->model->getInput()->imageData;
 	int i, j, k;
-	int width = this->model->cvImage()->width;
-	int height = this->model->cvImage()->height;
-	int channels = this->model->cvImage()->nChannels;
-	int step = this->model->cvImage()->widthStep;
+	int width = this->model->getInput()->width;
+	int height = this->model->getInput()->height;
+	int channels = this->model->getInput()->nChannels;
+	int step = this->model->getInput()->widthStep;
 	for(i=0;i<height;i++)
 		for(j=0;j<width;j++)
 			for(k=0;k<channels;k++)
@@ -576,10 +577,10 @@ void Chroma::applyFentosToOutput(
 		fentos->resizeLike(this->staticScene);
 		Image *fentosMask = fentos->cloneJustDimensions(1, IPL_DEPTH_8U);
 		cvInRangeS(
-			fentos->cvImage(),
+			fentos->getInput(),
 			cvScalar(1, 1, 1, 0),
 			cvScalar(255, 255, 255, 255),
-			fentosMask->cvImage()
+			fentosMask->getInput()
 		);
 		fentos->cloneTo(
 			this->outputSignal,
@@ -686,7 +687,7 @@ void Chroma::grabInputSignal(
 ) {
 	Camera* camera = input();
 	this->inputSignal = camera->getCurrentFrame();
-	if (this->inputSignal->originPosition() == BOTTOM_LEFT)
+	if (this->inputSignal->getOriginPosition() == BOTTOM_LEFT)
 		this->inputSignal->flip();
 }
 

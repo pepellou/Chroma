@@ -46,7 +46,7 @@ Image *Camera::getCurrentFrame(
 			currentCvFrame
 		);
 	} else {
-		this->_currentFrame->setCvImage(currentCvFrame);
+		this->_currentFrame->setInput(currentCvFrame);
 	}
 	return this->_currentFrame;
 }
