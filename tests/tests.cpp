@@ -1,5 +1,12 @@
 #include <igloo/igloo_alt.h>
 
+#include "messages.h"
+
 using namespace igloo;
 
-int main() { return TestRunner::RunAllTests(); }
+int main(
+) { 
+	Messages::enable = false;
+
+	return TestRunner::RunAllTests(); 
+}

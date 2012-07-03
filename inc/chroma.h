@@ -1,7 +1,6 @@
 #ifndef CHROMA_H
 #define CHROMA_H
 
-#include <string>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 

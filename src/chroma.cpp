@@ -1,7 +1,6 @@
-#include <iostream>
-
 #include "chroma.h"
 #include "window.h"
+#include "messages.h"
 
 using namespace std;
 
@@ -13,8 +12,8 @@ Chroma::Chroma(
 	this->video_fentos->setInput(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
 
 	this->fps = this->video_fentos->getFps();
-	cout << "FPS = " << fps << endl;
-	flush(cout);
+	
+	Messages::info("FPS = ", fps);
 
 	this->_name = "ChromaPrototype";
 	this->_input = Camera::theDefaultCamera();
@@ -68,19 +67,19 @@ Chroma::Chroma(
 void Chroma::operateOnDifference(
 ) {
 	this->currentOperationImage = this->difference;
-	cout << "Current operation on DIFFERENCE" << endl;
+	Messages::info("Current operation on DIFFERENCE");
 }
 
 void Chroma::operateOnModel(
 ) {
 	this->currentOperationImage = this->model;
-	cout << "Current operation on MODEL" << endl;
+	Messages::info("Current operation on MODEL");
 }
 
 void Chroma::operateOnOutput(
 ) {
 	this->currentOperationImage = this->outputSignal;
-	cout << "Current operation on OUTPUT" << endl;
+	Messages::info("Current operation on OUTPUT");
 }
 
 void Chroma::increaseBinarizationThreshold(
@@ -181,7 +180,7 @@ void Chroma::resetCropDimensions(
 void Chroma::increaseWeightRed(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -205,7 +204,7 @@ void Chroma::increaseWeightRed(
 void Chroma::decreaseWeightRed(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -229,7 +228,7 @@ void Chroma::decreaseWeightRed(
 void Chroma::increaseWeightGreen(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -253,7 +252,7 @@ void Chroma::increaseWeightGreen(
 void Chroma::decreaseWeightGreen(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -277,7 +276,7 @@ void Chroma::decreaseWeightGreen(
 void Chroma::increaseWeightBlue(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -301,7 +300,7 @@ void Chroma::increaseWeightBlue(
 void Chroma::decreaseWeightBlue(
 ) {
 	if (this->currentOperationImage == NULL) {
-		cout << "Not selected an operation image" << endl;
+		Messages::info("Not selected an operation image");
 	}
 	
 	if (this->currentOperationImage == this->difference) {
@@ -394,63 +393,74 @@ void Chroma::cropOutput(
 
 void Chroma::outputCropDimensions(
 ) {
-	cout 
-		<< "Crop dimensions = " 
-		<< this->crop_width << " x " << this->crop_height
-		<< " placed at (" << this->crop_x << ", " << this->crop_y << ")"
-		<< endl;
-	flush(cout);
+	Messages::info( 
+		"Crop dimensions = ",
+		this->crop_width,
+		" x ",
+		this->crop_height,
+		" placed at (",
+		this->crop_x,
+		", ",
+		this->crop_y,
+		")"
+	);
 }
 
 void Chroma::outputBinarizationThreshold(
 ) {
-	cout 
-		<< "Binarization threshold = " 
-		<< this->binarize_threshold 
-		<< endl;
-	flush(cout);
+	Messages::info( 
+		"Binarization threshold = ",
+		this->binarize_threshold 
+	);
 }
 
 void Chroma::outputRGBWeights(
 ) {
-	cout
-		<< "RGB weights: MODEL [ "
-		<< this->weight_model_r << ", "
-		<< this->weight_model_g << ", "
-		<< this->weight_model_b << " ], DIFFERENCE [ "
-		<< this->weight_difference_r << ", "
-		<< this->weight_difference_g << ", "
-		<< this->weight_difference_b << " ], OUTPUT [ "
-		<< this->weight_output_r << ", "
-		<< this->weight_output_g << ", "
-		<< this->weight_output_b << " ]"
-		<< endl;
-	flush(cout);
+	Messages::info(
+		"RGB weights: MODEL [ ",
+		this->weight_model_r,
+		", ",
+		this->weight_model_g,
+		", ",
+		this->weight_model_b,
+		" ], DIFFERENCE [ ",
+		this->weight_difference_r,
+		", ",
+		this->weight_difference_g,
+		", ",
+		this->weight_difference_b,
+		" ], OUTPUT [ ",
+		this->weight_output_r,
+		", ",
+		this->weight_output_g,
+		", ",
+		this->weight_output_b,
+		" ]"
+	);
 }
 
 void Chroma::outputHelp(
 ) {
-	cout 
-		<< "COMMANDS " << endl
-		<< "           <: Decrease crop width" << endl 
-		<< "           >: Increase crop width" << endl 
-		<< "           =: Set default crop dimensions" << endl 
-		<< "           -: Decrease crop height" << endl 
-		<< "           +: Increase crop height" << endl 
-		<< "         1/2: Decrease/increase RED weight" << endl 
-		<< "         3/4: Decrease/increase GREEN weight" << endl 
-		<< "         5/6: Decrease/increase BLUE weight" << endl 
-		<< "           ?: This help" << endl
-		<< "           G: Grab static scene" << endl 
-		<< "           D: Operate on DIFFERENCE" << endl 
-		<< "           M: Operate on MODEL" << endl 
-		<< "           O: Operate on OUTPUT" << endl 
-		<< "     <RePag>: Increase binarization threshold" << endl 
-		<< "     <AvPag>: Decrease binarization threshold" << endl 
-		<< endl << "   <CURSORS>: Move crop" << endl
-		<< endl << "       <ESC>: Exit program" << endl 
-	;
-	flush(cout);
+	Messages::info("COMMANDS ");
+	Messages::info("           <: Decrease crop width" );
+	Messages::info("           >: Increase crop width" );
+	Messages::info("           =: Set default crop dimensions" );
+	Messages::info("           -: Decrease crop height" );
+	Messages::info("           +: Increase crop height" );
+	Messages::info("         1/2: Decrease/increase RED weight" );
+	Messages::info("         3/4: Decrease/increase GREEN weight" );
+	Messages::info("         5/6: Decrease/increase BLUE weight" );
+	Messages::info("           ?: This help");
+	Messages::info("           G: Grab static scene" );
+	Messages::info("           D: Operate on DIFFERENCE" );
+	Messages::info("           M: Operate on MODEL" );
+	Messages::info("           O: Operate on OUTPUT" );
+	Messages::info("     <RePag>: Increase binarization threshold" );
+	Messages::info("     <AvPag>: Decrease binarization threshold" );
+	Messages::info("");
+	Messages::info("   <CURSORS>: Move crop");
+	Messages::info("");
+	Messages::info("       <ESC>: Exit program" );
 }
 
 void Chroma::release(
@@ -517,11 +527,17 @@ void Chroma::computeDistorsion(
 	cvSetImageROI(this->distorsion->getInput(), cvRect(0, 0, 20, 20));
 	CvScalar theDistorsion = cvAvg(this->distorsion->getInput());
 	cvResetImageROI(this->distorsion->getInput());
-	cout << "Distorsion = [ " 
-		<< theDistorsion.val[0] << ", "
-		<< theDistorsion.val[1] << ", "
-		<< theDistorsion.val[2] << ", "
-		<< theDistorsion.val[3] << "]" << endl;
+	Messages::info(
+		"Distorsion = [ ",
+		theDistorsion.val[0],
+		", ",
+		theDistorsion.val[1],
+		", ",
+		theDistorsion.val[2],
+		", ",
+		theDistorsion.val[3],
+		"]"
+	);
 	uchar *data = (uchar *) this->model->getInput()->imageData;
 	int i, j, k;
 	int width = this->model->getInput()->width;

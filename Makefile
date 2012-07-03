@@ -7,7 +7,8 @@ INC=-I/opt/local/include \
 SRC=src/chroma.cpp \
 	src/image.cpp \
 	src/camera.cpp \
-	src/window.cpp
+	src/window.cpp \
+	src/messages.cpp
 
 TEST=tests/chroma.cpp \
 	tests/image.cpp \
