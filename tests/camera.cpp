@@ -5,8 +5,9 @@ using namespace igloo;
 
 Describe(a_camera) {
 
-	CvCapture *theInput;
 	Camera camera;
+
+	CvCapture *theInput;
 
 	void SetUp() {
 		theInput = cvCaptureFromAVI(
@@ -16,6 +17,7 @@ Describe(a_camera) {
 	}
 
 	void TearDown() {
+		cvReleaseCapture(&theInput);
 	}
 
 	It(has_fps) {
