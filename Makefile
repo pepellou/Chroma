@@ -6,14 +6,14 @@ INC=-I/opt/local/include \
 
 SRC=src/chroma.cpp \
 	src/image.cpp \
-	src/camera.cpp \
+	src/video.cpp \
 	src/window.cpp \
 	src/messages.cpp
 
 TEST= \
 	tests/chroma.cpp \
 	tests/image.cpp \
-	tests/camera.cpp \
+	tests/video.cpp \
 	tests/tests.cpp
 
 MAIN=src/main.cpp

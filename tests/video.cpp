@@ -1,11 +1,11 @@
 #include <igloo/igloo_alt.h>
-#include "camera.h"
+#include "video.h"
 
 using namespace igloo;
 
-Describe(a_camera) {
+Describe(a_video) {
 
-	Camera *camera;
+	Video *camera;
 
 	CvCapture *theInput;
 
@@ -13,7 +13,7 @@ Describe(a_camera) {
 		theInput = cvCaptureFromAVI(
 			"./tests/data/fentos_base.mov"
 		);
-		camera = new Camera();
+		camera = new Video();
 		camera->setInput(theInput);
 	}
 
@@ -36,16 +36,16 @@ Describe(a_camera) {
 	}
 
 	It(has_default_values) {
-		Camera *anotherCamera = new Camera();
+		Video *anotherVideo = new Video();
 		Assert::That(
-			anotherCamera->getFps(), 
+			anotherVideo->getFps(), 
 			Is().EqualTo(0)
 		);
 		Assert::That(
-			anotherCamera->getInput(), 
+			anotherVideo->getInput(), 
 			Is().EqualTo((CvCapture *) NULL)
 		);
-		delete anotherCamera;
+		delete anotherVideo;
 	}
 
 	It(returns_current_frame) {
@@ -60,11 +60,11 @@ Describe(a_camera) {
 	}
 
 	It(gives_a_unique_default_camera) {
-		Camera *theDefaultCamera = Camera::theDefaultCamera();
-		Camera *anotherInstance = Camera::theDefaultCamera();
+		Video *theDefaultCamera = Video::theDefaultCamera();
+		Video *anotherInstance = Video::theDefaultCamera();
 		Assert::That(
 			theDefaultCamera,
-			Is().Not().EqualTo((Camera *) NULL)
+			Is().Not().EqualTo((Video *) NULL)
 		);
 		Assert::That(
 			anotherInstance,

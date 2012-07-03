@@ -5,9 +5,9 @@
 using namespace std;
 
 Chroma::Chroma(
-	Camera *camera
+	Video *video
 ) {
-	this->_input = camera;
+	this->_input = video;
 	this->_name = "ChromaPrototype";
 	this->binarize_threshold = 40;
 
@@ -21,10 +21,11 @@ Chroma::Chroma(
 	this->weight_model_g = 1.0;
 	this->weight_model_b = 1.0;
 
-	this->video_fentos = new Camera();
+	this->video_fentos = new Video();
 	this->video_fentos->setInput(
 		cvCaptureFromAVI("./tests/data/fentos_base.mov")
 	);
+
 	this->fps = this->video_fentos->getFps();
 	
 	Messages::info("FPS = ", fps);
@@ -491,11 +492,11 @@ Chroma::~Chroma(
 
 void Chroma::grabStaticScene(
 ) {
-	Camera* camera = getInput();
+	Video* video = getInput();
 	if (this->staticScene != NULL) {
 		this->staticScene->release();
 	}
-	this->staticScene = camera->getCurrentFrame()->clone();
+	this->staticScene = video->getCurrentFrame()->clone();
 }
 
 void Chroma::copyStaticToModel(
@@ -708,8 +709,8 @@ bool Chroma::processKeys(
 
 void Chroma::grabInputSignal(
 ) {
-	Camera* camera = getInput();
-	this->inputSignal = camera->getCurrentFrame();
+	Video* video = getInput();
+	this->inputSignal = video->getCurrentFrame();
 	if (this->inputSignal->getOriginPosition() == BOTTOM_LEFT)
 		this->inputSignal->flip();
 }
@@ -726,12 +727,12 @@ string Chroma::name(
 }
 
 void Chroma::setInput(
-	Camera *input
+	Video *input
 ) {
 	this->_input = input;
 }
 
-Camera *Chroma::getInput(
+Video *Chroma::getInput(
 ) {
 	return this->_input;
 }

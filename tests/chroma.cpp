@@ -1,6 +1,6 @@
 #include <igloo/igloo_alt.h>
 #include "chroma.h"
-#include "camera.h"
+#include "video.h"
 
 using namespace igloo;
 using namespace std;
@@ -9,10 +9,10 @@ Describe(a_chroma) {
 
 	Chroma *chroma;
 
-	Camera *theInput;
+	Video *theInput;
 
 	void SetUp() {
-		theInput = new Camera();
+		theInput = new Video();
 		theInput->setInput(cvCreateFileCapture(	
 			"./tests/data/test.avi"
 		));
@@ -42,13 +42,13 @@ Describe(a_chroma) {
 	}
 
 	It(has_an_input_that_can_be_set) {
-		Camera* aCamera = new Camera();
+		Video* aVideo = new Video();
 
-		chroma->setInput(aCamera);
+		chroma->setInput(aVideo);
 
 		Assert::That(
 			chroma->getInput(), 
-			Is().EqualTo(aCamera)
+			Is().EqualTo(aVideo)
 		);
 	}
 

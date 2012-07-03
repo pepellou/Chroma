@@ -1,44 +1,44 @@
-#include "camera.h"
+#include "video.h"
 
-Camera *Camera::_theDefaultCamera = NULL;
+Video *Video::_theDefaultCamera = NULL;
 
-Camera::Camera(
+Video::Video(
 ) {
 	this->_input = NULL;
 	this->_currentFrame = NULL;
 }
 
-void Camera::setInput(
+void Video::setInput(
 	CvCapture *cvCapture
 ) {
 	this->_input = cvCapture;
 }
 
-CvCapture *Camera::getInput(
+CvCapture *Video::getInput(
 ) {
 	return this->_input;
 }
 
-Camera *Camera::theDefaultCamera(
+Video *Video::theDefaultCamera(
 ) {
-	if (Camera::_theDefaultCamera == NULL) {
+	if (Video::_theDefaultCamera == NULL) {
 		CvCapture *cvCapture = cvCreateCameraCapture(1);
 		if (cvCapture == NULL)
 			cvCapture = cvCreateCameraCapture(0);
-		Camera::_theDefaultCamera = new Camera();
-		Camera::_theDefaultCamera->setInput(
+		Video::_theDefaultCamera = new Video();
+		Video::_theDefaultCamera->setInput(
 			cvCapture
 		);
 	}
-	return Camera::_theDefaultCamera;
+	return Video::_theDefaultCamera;
 }
 
-Camera::~Camera(
+Video::~Video(
 ) {
 	cvReleaseCapture(&_input);
 }
 
-Image *Camera::getCurrentFrame(
+Image *Video::getCurrentFrame(
 ) {
 	IplImage *currentCvFrame = cvQueryFrame(_input);
 	if (this->_currentFrame == NULL) {
@@ -51,7 +51,7 @@ Image *Camera::getCurrentFrame(
 	return this->_currentFrame;
 }
 
-int Camera::getFps(
+int Video::getFps(
 ) {
 	return ( int ) cvGetCaptureProperty( this->_input, CV_CAP_PROP_FPS );
 }

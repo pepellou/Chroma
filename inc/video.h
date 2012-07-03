@@ -6,12 +6,12 @@
 
 #include "image.h"
 
-class Camera {
+class Video {
 
 	public:
-		Camera();
-		~Camera();
-		static Camera *theDefaultCamera();
+		Video();
+		~Video();
+		static Video *theDefaultCamera();
 
 		CvCapture *getInput();
 		int getFps();
@@ -20,7 +20,7 @@ class Camera {
 		void setInput(CvCapture *cvCapture);
 
 	private:
-		static Camera *_theDefaultCamera;
+		static Video *_theDefaultCamera;
 		CvCapture *_input;
 		Image *_currentFrame;
 

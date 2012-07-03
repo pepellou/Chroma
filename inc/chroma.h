@@ -4,21 +4,21 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-#include "camera.h"
+#include "video.h"
 #include "image.h"
 #include "window.h"
 
 class Chroma {
 
 	public:
-		Chroma(Camera *input);
+		Chroma(Video *input);
 		~Chroma();
 
 		std::string name();
-		Camera *getInput();
+		Video *getInput();
 
 		void setName(std::string name);
-		void setInput(Camera *input);
+		void setInput(Video *input);
 
 		int mainLoop();
 
@@ -57,7 +57,7 @@ class Chroma {
 
 	private:
 		std::string _name;
-		Camera *_input;
+		Video *_input;
 		Window *wInput;
 		Window *wModel;
 		Window *wDifference;
@@ -104,7 +104,7 @@ class Chroma {
 		float weight_difference_g;
 		float weight_difference_b;
 
-		Camera *video_fentos;
+		Video *video_fentos;
 		void applyFentosToOutput();
 
 		int fps;

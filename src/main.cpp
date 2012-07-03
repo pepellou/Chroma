@@ -2,7 +2,7 @@
 
 int main( int argc, char** argv ) {
 	Chroma *chroma = new Chroma(
-		Camera::theDefaultCamera()
+		Video::theDefaultCamera()
 	);
 	int error = chroma->mainLoop();
 	delete chroma;
