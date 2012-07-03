@@ -8,6 +8,10 @@
 #include "image.h"
 #include "window.h"
 
+#include <vector>
+
+using namespace std;
+
 class Chroma {
 
 	public:
@@ -19,6 +23,7 @@ class Chroma {
 
 		void setName(std::string name);
 		void setInput(Video *input);
+		void setFps(int fps);
 
 		int mainLoop();
 
@@ -54,6 +59,8 @@ class Chroma {
 		void operateOnModel();
 		void operateOnOutput();
 		void operateOnDifference();
+
+		void addVideoLayer(Video *video);
 
 	private:
 		std::string _name;
@@ -104,10 +111,12 @@ class Chroma {
 		float weight_difference_g;
 		float weight_difference_b;
 
-		Video *video_fentos;
-		void applyFentosToOutput();
+		void applyVideoLayersToOutput();
+		void applyVideoLayerToOutput(Video *layer);
 
 		int fps;
+
+		vector<Video *> videoLayers;
 };
 
 #endif

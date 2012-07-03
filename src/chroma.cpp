@@ -21,15 +21,6 @@ Chroma::Chroma(
 	this->weight_model_g = 1.0;
 	this->weight_model_b = 1.0;
 
-	this->video_fentos = new Video();
-	this->video_fentos->setInput(
-		cvCaptureFromAVI("./tests/data/fentos_base.mov")
-	);
-
-	this->fps = this->video_fentos->getFps();
-	
-	Messages::info("FPS = ", fps);
-
 	this->wInput = new Window((char *) "INPUT", 1, 1);
 	this->wModel = new Window((char *) "MODEL", 400, 1);
 	this->wDistorsion = 
@@ -590,28 +581,41 @@ void Chroma::applyBackgroundToOutput(
 	);
 }
 
-void Chroma::applyFentosToOutput(
+void Chroma::applyVideoLayersToOutput(
 ) {
-	Image *frame = this->video_fentos->getCurrentFrame();
+	for (vector<Video *>::iterator layer = 
+		this->videoLayers.begin();
+		layer != this->videoLayers.end();
+		++layer
+	) {
+		Video *video = *layer;
+		this->applyVideoLayerToOutput(video);
+	}
+}
+
+void Chroma::applyVideoLayerToOutput(
+	Video *video
+) {
+	Image *frame = video->getCurrentFrame();
 	if (frame != NULL) {
-		Image *fentos = frame->clone();
-		fentos->resizeLike(this->staticScene);
-		Image *fentosMask = fentos->cloneJustDimensions(
+		Image *theFrame = frame->clone();
+		theFrame->resizeLike(this->staticScene);
+		Image *theFrameMask = theFrame->cloneJustDimensions(
 			1, 
 			IPL_DEPTH_8U
 		);
 		cvInRangeS(
-			fentos->getInput(),
+			theFrame->getInput(),
 			cvScalar(1, 1, 1, 0),
 			cvScalar(255, 255, 255, 255),
-			fentosMask->getInput()
+			theFrameMask->getInput()
 		);
-		fentos->cloneTo(
+		theFrame->cloneTo(
 			this->outputSignal,
-			fentosMask
+			theFrameMask
 		);
-		fentos->release();
-		fentosMask->release();
+		theFrame->release();
+		theFrameMask->release();
 	}
 }
 
@@ -752,7 +756,7 @@ int Chroma::mainLoop(
 		this->adjustDifference();
 
 		this->applyBackgroundToOutput();
-		this->applyFentosToOutput();
+		this->applyVideoLayersToOutput();
 		this->cropOutput();
 		this->adjustOutput();
 
@@ -761,4 +765,17 @@ int Chroma::mainLoop(
 		running = this->processKeys();
 	}
 	return 0;
+}
+
+void Chroma::addVideoLayer(
+	Video *video
+) {
+	this->videoLayers.push_back(video);
+}
+
+void Chroma::setFps(
+	int fps
+) {
+	Messages::info("FPS = ", fps);
+	this->fps = fps;
 }
