@@ -1,4 +1,5 @@
 #include "image.h"
+#include "messages.h"
 
 Image::Image(
 ) {
@@ -36,7 +37,11 @@ void Image::setInput(
 
 void Image::release(
 ) {
-	cvReleaseImage(&_input);
+	try {
+		cvReleaseImage(&_input);
+	} catch (cv::Exception& e) {
+		Messages::error("Warning: can't release image:");
+	}
 }
 
 bool Image::isValid(
