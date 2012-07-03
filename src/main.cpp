@@ -1,6 +1,10 @@
 #include "chroma.h"
 
 int main( int argc, char** argv ) {
-	Chroma chroma;
-	return chroma.mainLoop();
+	Chroma *chroma = new Chroma(
+		Camera::theDefaultCamera()
+	);
+	int error = chroma->mainLoop();
+	delete chroma;
+	return error;
 }

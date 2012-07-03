@@ -11,17 +11,16 @@
 class Chroma {
 
 	public:
-		Chroma();
+		Chroma(Camera *input);
+		~Chroma();
 
 		std::string name();
-		Camera *input();
+		Camera *getInput();
 
 		void setName(std::string name);
 		void setInput(Camera *input);
 
 		int mainLoop();
-
-		void release();
 
 		void grabStaticScene();
 		void copyStaticToModel();

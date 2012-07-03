@@ -5,23 +5,36 @@
 using namespace std;
 
 Chroma::Chroma(
+	Camera *camera
 ) {
+	this->_input = camera;
+	this->_name = "ChromaPrototype";
 	this->binarize_threshold = 40;
 
-	this->video_fentos = new Camera();
-	this->video_fentos->setInput(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
+	this->weight_difference_r = 1.0;
+	this->weight_difference_g = 1.0;
+	this->weight_difference_b = 1.0;
+	this->weight_output_r = 1.0;
+	this->weight_output_g = 1.0;
+	this->weight_output_b = 1.0;
+	this->weight_model_r = 1.0;
+	this->weight_model_g = 1.0;
+	this->weight_model_b = 1.0;
 
+	this->video_fentos = new Camera();
+	this->video_fentos->setInput(
+		cvCaptureFromAVI("./tests/data/fentos_base.mov")
+	);
 	this->fps = this->video_fentos->getFps();
 	
 	Messages::info("FPS = ", fps);
 
-	this->_name = "ChromaPrototype";
-	this->_input = Camera::theDefaultCamera();
-
 	this->wInput = new Window((char *) "INPUT", 1, 1);
 	this->wModel = new Window((char *) "MODEL", 400, 1);
-	this->wDistorsion = new Window((char *) "DISTORSION", 1, 700);
-	this->wDifference = new Window((char *) "DIFFERENCE", 800, 1);
+	this->wDistorsion = 
+		new Window((char *) "DISTORSION", 1, 700);
+	this->wDifference = 
+		new Window((char *) "DIFFERENCE", 800, 1);
 	this->wMask = new Window(
 		(char *) "MASK", 
 		1, 
@@ -53,15 +66,6 @@ Chroma::Chroma(
 
 	this->operateOnModel();
 
-	this->weight_difference_r = 1.0;
-	this->weight_difference_g = 1.0;
-	this->weight_difference_b = 1.0;
-	this->weight_output_r = 1.0;
-	this->weight_output_g = 1.0;
-	this->weight_output_b = 1.0;
-	this->weight_model_r = 1.0;
-	this->weight_model_g = 1.0;
-	this->weight_model_b = 1.0;
 }
 
 void Chroma::operateOnDifference(
@@ -463,7 +467,7 @@ void Chroma::outputHelp(
 	Messages::info("       <ESC>: Exit program" );
 }
 
-void Chroma::release(
+Chroma::~Chroma(
 ) {
 	this->wInput->release();
 	this->wModel->release();
@@ -471,7 +475,7 @@ void Chroma::release(
 	this->wDistorsion->release();
 	this->wMask->release();
 	this->wOutput->release();
-	this->_input->release();
+	delete this->_input;
 	this->staticScene->release();
 	this->model->release();
 	this->background->release();
@@ -487,7 +491,7 @@ void Chroma::release(
 
 void Chroma::grabStaticScene(
 ) {
-	Camera* camera = input();
+	Camera* camera = getInput();
 	if (this->staticScene != NULL) {
 		this->staticScene->release();
 	}
@@ -591,7 +595,10 @@ void Chroma::applyFentosToOutput(
 	if (frame != NULL) {
 		Image *fentos = frame->clone();
 		fentos->resizeLike(this->staticScene);
-		Image *fentosMask = fentos->cloneJustDimensions(1, IPL_DEPTH_8U);
+		Image *fentosMask = fentos->cloneJustDimensions(
+			1, 
+			IPL_DEPTH_8U
+		);
 		cvInRangeS(
 			fentos->getInput(),
 			cvScalar(1, 1, 1, 0),
@@ -701,7 +708,7 @@ bool Chroma::processKeys(
 
 void Chroma::grabInputSignal(
 ) {
-	Camera* camera = input();
+	Camera* camera = getInput();
 	this->inputSignal = camera->getCurrentFrame();
 	if (this->inputSignal->getOriginPosition() == BOTTOM_LEFT)
 		this->inputSignal->flip();
@@ -724,7 +731,7 @@ void Chroma::setInput(
 	this->_input = input;
 }
 
-Camera *Chroma::input(
+Camera *Chroma::getInput(
 ) {
 	return this->_input;
 }
@@ -752,6 +759,5 @@ int Chroma::mainLoop(
 
 		running = this->processKeys();
 	}
-	this->release();
 	return 0;
 }
