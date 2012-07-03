@@ -5,7 +5,7 @@ using namespace igloo;
 
 Describe(a_camera) {
 
-	Camera camera;
+	Camera *camera;
 
 	CvCapture *theInput;
 
@@ -13,46 +13,48 @@ Describe(a_camera) {
 		theInput = cvCaptureFromAVI(
 			"./tests/data/fentos_base.mov"
 		);
-		camera.setInput(theInput);
+		camera = new Camera();
+		camera->setInput(theInput);
 	}
 
 	void TearDown() {
-		cvReleaseCapture(&theInput);
+		delete camera;
 	}
 
 	It(has_fps) {
 		Assert::That(
-			camera.getFps(), 
+			camera->getFps(), 
 			Is().EqualTo(25)
 		);
 	}
 
 	It(has_input) {
 		Assert::That(
-			camera.getInput(), 
+			camera->getInput(), 
 			Is().EqualTo(theInput)
 		);
 	}
 
 	It(has_default_values) {
-		Camera anotherCamera;
+		Camera *anotherCamera = new Camera();
 		Assert::That(
-			anotherCamera.getFps(), 
+			anotherCamera->getFps(), 
 			Is().EqualTo(0)
 		);
 		Assert::That(
-			anotherCamera.getInput(), 
+			anotherCamera->getInput(), 
 			Is().EqualTo((CvCapture *) NULL)
 		);
+		delete anotherCamera;
 	}
 
 	It(returns_current_frame) {
 		Assert::That(
-			camera.getCurrentFrame(),
+			camera->getCurrentFrame(),
 			Is().Not().EqualTo((Image *) NULL)
 		);
 		Assert::That(
-			camera.getCurrentFrame()->isValid(),
+			camera->getCurrentFrame()->isValid(),
 			Is().True()
 		);
 	}
