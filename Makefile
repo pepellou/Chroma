@@ -9,7 +9,13 @@ SRC=src/chroma.cpp \
 	src/camera.cpp \
 	src/window.cpp
 
-TEST=tests/test.cpp
+TEST=tests/chroma.cpp \
+	tests/image.cpp \
+	tests/camera.cpp \
+	tests/tests.cpp
+
+TEST=tests/camera.cpp \
+	tests/tests.cpp
 
 MAIN=src/main.cpp
 

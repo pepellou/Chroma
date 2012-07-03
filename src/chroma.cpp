@@ -9,8 +9,10 @@ Chroma::Chroma(
 ) {
 	this->binarize_threshold = 40;
 
-	this->video_fentos = new Camera(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
-	this->fps = this->video_fentos->fps();
+	this->video_fentos = new Camera();
+	this->video_fentos->setInput(cvCaptureFromAVI("./tests/data/fentos_base.mov"));
+
+	this->fps = this->video_fentos->getFps();
 	cout << "FPS = " << fps << endl;
 	flush(cout);
 
@@ -478,7 +480,7 @@ void Chroma::grabStaticScene(
 	if (this->staticScene != NULL) {
 		this->staticScene->release();
 	}
-	this->staticScene = camera->grabStaticScene();
+	this->staticScene = camera->getCurrentFrame()->clone();
 }
 
 void Chroma::copyStaticToModel(
@@ -568,7 +570,7 @@ void Chroma::applyBackgroundToOutput(
 
 void Chroma::applyFentosToOutput(
 ) {
-	Image *frame = this->video_fentos->grabCurrentFrame();
+	Image *frame = this->video_fentos->getCurrentFrame();
 	if (frame != NULL) {
 		Image *fentos = frame->clone();
 		fentos->resizeLike(this->staticScene);
@@ -683,7 +685,7 @@ bool Chroma::processKeys(
 void Chroma::grabInputSignal(
 ) {
 	Camera* camera = input();
-	this->inputSignal = camera->grabCurrentFrame();
+	this->inputSignal = camera->getCurrentFrame();
 	if (this->inputSignal->originPosition() == BOTTOM_LEFT)
 		this->inputSignal->flip();
 }

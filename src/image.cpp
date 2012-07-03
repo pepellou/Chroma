@@ -35,7 +35,9 @@ bool Image::isValid(
 
 Image *Image::clone(
 ) {
-	return new Image(cvCloneImage(_cvImage));
+	Image *imageClone = new Image(cvCloneImage(_cvImage));
+	imageClone->setOriginPosition(TOP_LEFT); 
+	return imageClone;
 }
 
 Image *Image::cloneJustDimensions(

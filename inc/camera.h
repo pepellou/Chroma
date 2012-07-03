@@ -9,20 +9,20 @@
 class Camera {
 
 	public:
-		Camera(CvCapture *cvCapture);
-		CvCapture *cvCapture();
+		Camera();
 		static Camera *theDefaultCamera();
+
+		CvCapture *getInput();
+		int getFps();
+		Image *getCurrentFrame();
+
+		void setInput(CvCapture *cvCapture);
 		void release();
-		Image *grabCurrentFrame();
-		Image *grabStaticScene();
-		long processedFrames();
-		int fps();
 
 	private:
 		static Camera *_theDefaultCamera;
-		CvCapture *_cvCapture;
+		CvCapture *_input;
 		Image *_currentFrame;
-		long _processed_frames;
 
 };
 

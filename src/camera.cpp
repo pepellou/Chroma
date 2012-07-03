@@ -3,16 +3,20 @@
 Camera *Camera::_theDefaultCamera = NULL;
 
 Camera::Camera(
-	CvCapture *cvCapture
 ) {
-	this->_cvCapture = cvCapture;
+	this->_input = NULL;
 	this->_currentFrame = NULL;
-	this->_processed_frames = 0;
 }
 
-CvCapture *Camera::cvCapture(
+void Camera::setInput(
+	CvCapture *cvCapture
 ) {
-	return this->_cvCapture;
+	this->_input = cvCapture;
+}
+
+CvCapture *Camera::getInput(
+) {
+	return this->_input;
 }
 
 Camera *Camera::theDefaultCamera(
@@ -21,19 +25,22 @@ Camera *Camera::theDefaultCamera(
 		CvCapture *cvCapture = cvCreateCameraCapture(1);
 		if (cvCapture == NULL)
 			cvCapture = cvCreateCameraCapture(0);
-		Camera::_theDefaultCamera = new Camera(cvCapture);
+		Camera::_theDefaultCamera = new Camera();
+		Camera::_theDefaultCamera->setInput(
+			cvCapture
+		);
 	}
 	return Camera::_theDefaultCamera;
 }
 
 void Camera::release(
 ) {
-	cvReleaseCapture(&_cvCapture);
+	cvReleaseCapture(&_input);
 }
 
-Image *Camera::grabCurrentFrame(
+Image *Camera::getCurrentFrame(
 ) {
-	IplImage *currentCvFrame = cvQueryFrame(_cvCapture);
+	IplImage *currentCvFrame = cvQueryFrame(_input);
 	if (this->_currentFrame == NULL) {
 		this->_currentFrame = new Image(
 			currentCvFrame
@@ -41,27 +48,10 @@ Image *Camera::grabCurrentFrame(
 	} else {
 		this->_currentFrame->setCvImage(currentCvFrame);
 	}
-	this->_processed_frames++;
 	return this->_currentFrame;
 }
 
-Image *Camera::grabStaticScene(
+int Camera::getFps(
 ) {
-	Image *currentFrame = this->grabCurrentFrame();
-
-	Image *staticScene = currentFrame->clone();
-
-	staticScene->setOriginPosition(TOP_LEFT); 
-
-	return staticScene;
-}
-
-long Camera::processedFrames(
-) {
-	return this->_processed_frames;
-}
-
-int Camera::fps(
-) {
-	return ( int ) cvGetCaptureProperty( this->_cvCapture, CV_CAP_PROP_FPS );
+	return ( int ) cvGetCaptureProperty( this->_input, CV_CAP_PROP_FPS );
 }
