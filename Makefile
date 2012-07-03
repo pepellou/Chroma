@@ -10,7 +10,8 @@ SRC=src/chroma.cpp \
 	src/window.cpp \
 	src/messages.cpp
 
-TEST=tests/chroma.cpp \
+TEST= \
+	tests/chroma.cpp \
 	tests/image.cpp \
 	tests/camera.cpp \
 	tests/tests.cpp
