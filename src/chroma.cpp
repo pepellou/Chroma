@@ -745,24 +745,28 @@ int Chroma::mainLoop(
 ) {
 	bool running = true;
 	while (running) {
-		this->grabInputSignal();
-		this->copyInputToOutput();
+		try {
+			this->grabInputSignal();
+			this->copyInputToOutput();
 
-		this->copyStaticToModel();
-		this->adjustModel();
-		//this->computeDistorsion();
+			this->copyStaticToModel();
+			this->adjustModel();
+			//this->computeDistorsion();
 
-		this->computeDifference();
-		this->adjustDifference();
+			this->computeDifference();
+			this->adjustDifference();
 
-		this->applyBackgroundToOutput();
-		this->applyVideoLayersToOutput();
-		this->cropOutput();
-		this->adjustOutput();
+			this->applyBackgroundToOutput();
+			this->applyVideoLayersToOutput();
+			this->cropOutput();
+			this->adjustOutput();
 
-		this->renderWindows();
+			this->renderWindows();
 
-		running = this->processKeys();
+			running = this->processKeys();
+		} catch (cv::Exception& e) {
+			Messages::error("Warning: error during main loop!");
+		}
 	}
 	return 0;
 }
